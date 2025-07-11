@@ -1,0 +1,8 @@
+fragment textboxElement on OptiFormsTextboxElement {
+    Label
+    Tooltip
+    Placeholder
+    AutoComplete
+    PredefinedValue
+    Validators
+}

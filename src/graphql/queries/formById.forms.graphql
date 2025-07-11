@@ -1,0 +1,60 @@
+query Forms($key: String, $version: String) {
+    OptiFormsContainerData(
+        where: {
+            _metadata: { key: { eq: $key } }
+            _or: { _metadata: { version: { eq: $version } } }
+        }
+    ) {
+        items {
+            composition {
+                grids: nodes {
+                    ... on CompositionStructureNode {
+                        key
+                        __typename
+                        displayName
+                        nodeType
+                        layoutType
+                        component {
+                            ..._IComponent
+                        }
+                        nodes: nodes {
+                            ... on CompositionStructureNode {
+                                key
+                                __typename
+                                displayName
+                                nodeType
+                                layoutType
+                                nodes: nodes {
+                                    ... on CompositionStructureNode {
+                                        key
+                                        __typename
+                                        displayName
+                                        nodeType
+                                        layoutType
+                                        nodes: nodes {
+                                            ...compositionComponentNode
+                                            ... on CompositionStructureNode {
+                                                key
+                                                __typename
+                                                displayName
+                                                nodeType
+                                                layoutType
+                                                nodes: nodes {
+                                                    ...compositionComponentNode
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            _metadata {
+                key
+                version
+            }
+        }
+    }
+}

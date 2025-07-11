@@ -1,0 +1,22 @@
+fragment AllComponents on _IComponent {
+    ...AllComponentsExceptGrid
+    ...Grid # Grid needs to be separated from the rest of the components because of ContentArea and recursive rendering
+}
+
+fragment AllComponentsExceptGrid on _IComponent {
+    ...Text
+    ...Image
+    ...CallToAction
+    ...Video
+    ...Paragraph
+    ...Card
+    ...Hero
+    ...Carousel
+    ...Collapse
+    ...ArticleList
+    ...Button
+    ...Iframe
+    ...VideoExternal
+    ...Divider
+    ...OptiFormsContainerData
+}

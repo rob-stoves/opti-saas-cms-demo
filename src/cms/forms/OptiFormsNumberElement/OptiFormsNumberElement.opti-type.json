@@ -1,0 +1,73 @@
+{
+    "key": "OptiFormsNumberElement",
+    "displayName": "",
+    "description": "",
+    "baseType": "component",
+    "sortOrder": 0,
+    "mayContainTypes": [],
+    "mediaFileExtensions": [],
+    "compositionBehaviors": [],
+    "properties": {
+        "Label": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 100,
+            "editorSettings": {}
+        },
+        "Placeholder": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 200,
+            "editorSettings": {}
+        },
+        "Tooltip": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 300,
+            "editorSettings": {}
+        },
+        "PredefinedValue": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": false,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 400,
+            "editorSettings": {}
+        },
+        "Validators": {
+            "type": "json",
+            "format": "ValidatorListProperty",
+            "displayName": "",
+            "description": "",
+            "localized": false,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 900,
+            "editorSettings": {}
+        },
+        "AutoComplete": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": false,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 1100,
+            "editorSettings": {}
+        }
+    }
+}
