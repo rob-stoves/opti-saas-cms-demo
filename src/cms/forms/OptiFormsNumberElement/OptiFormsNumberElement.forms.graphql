@@ -1,0 +1,7 @@
+fragment numberElement on OptiFormsNumberElement {
+    Label
+    Tooltip
+    Placeholder
+    AutoComplete
+    PredefinedValue
+}
