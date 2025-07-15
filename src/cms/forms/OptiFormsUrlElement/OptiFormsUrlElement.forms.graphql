@@ -1,7 +1,7 @@
-fragment urlElement on OptiFormsUrlElement {
+fragment urlElement on OptiFormsDIUrlElement {
     Label
     Tooltip
     Placeholder
     PredefinedValue
-    Validators
+    # Validators
 }

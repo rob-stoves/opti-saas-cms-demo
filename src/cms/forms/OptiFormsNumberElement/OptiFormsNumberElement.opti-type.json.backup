@@ -1,16 +1,14 @@
 {
-    "key": "OptiFormsDIContainerData",
+    "key": "OptiFormsDINumberElement",
     "displayName": "",
     "description": "",
-    "baseType": "_section",
+    "baseType": "component",
     "sortOrder": 0,
     "mayContainTypes": [],
     "mediaFileExtensions": [],
-    "compositionBehaviors": [
-        "sectionEnabled"
-    ],
+    "compositionBehaviors": [],
     "properties": {
-        "Title": {
+        "Label": {
             "type": "string",
             "displayName": "",
             "description": "",
@@ -20,7 +18,7 @@
             "sortOrder": 100,
             "editorSettings": {}
         },
-        "Description": {
+        "Placeholder": {
             "type": "string",
             "displayName": "",
             "description": "",
@@ -30,8 +28,8 @@
             "sortOrder": 200,
             "editorSettings": {}
         },
-        "ShowSummaryMessageAfterSubmission": {
-            "type": "boolean",
+        "Tooltip": {
+            "type": "string",
             "displayName": "",
             "description": "",
             "localized": true,
@@ -40,34 +38,35 @@
             "sortOrder": 300,
             "editorSettings": {}
         },
-        "SubmitConfirmationMessage": {
+        "PredefinedValue": {
             "type": "string",
             "displayName": "",
             "description": "",
-            "localized": true,
+            "localized": false,
             "required": false,
             "group": "Information",
             "sortOrder": 400,
             "editorSettings": {}
         },
-        "ResetConfirmationMessage": {
+        "Validators": {
+            "type": "json",
+            "format": "ValidatorListProperty",
+            "displayName": "",
+            "description": "",
+            "localized": false,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 900,
+            "editorSettings": {}
+        },
+        "AutoComplete": {
             "type": "string",
             "displayName": "",
             "description": "",
-            "localized": true,
+            "localized": false,
             "required": false,
             "group": "Information",
-            "sortOrder": 500,
-            "editorSettings": {}
-        },
-        "SubmitUrl": {
-            "type": "url",
-            "displayName": "",
-            "description": "",
-            "localized": true,
-            "required": false,
-            "group": "Information",
-            "sortOrder": 600,
+            "sortOrder": 1100,
             "editorSettings": {}
         }
     }

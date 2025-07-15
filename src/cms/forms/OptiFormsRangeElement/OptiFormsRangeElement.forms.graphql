@@ -1,4 +1,4 @@
-fragment rangeElement on OptiFormsRangeElement {
+fragment rangeElement on OptiFormsDIRangeElement {
     Label
     Tooltip
     PredefinedValue

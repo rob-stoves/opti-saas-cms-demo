@@ -2,7 +2,7 @@
     "key": "OptiFormsDIContainerData",
     "displayName": "",
     "description": "",
-    "baseType": "_section",
+    "baseType": "section",
     "sortOrder": 0,
     "mayContainTypes": [],
     "mediaFileExtensions": [],

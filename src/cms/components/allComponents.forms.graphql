@@ -3,7 +3,7 @@ fragment AllComponents on _IComponent {
     ...Grid # Grid needs to be separated from the rest of the components because of ContentArea and recursive rendering
 }
 
-fragment AllComponentsExceptGrid on _IComponent {
+fragment AllComponentsExceptGrid on _IContent {
     ...Text
     ...Image
     ...CallToAction
@@ -18,5 +18,6 @@ fragment AllComponentsExceptGrid on _IComponent {
     ...Iframe
     ...VideoExternal
     ...Divider
-    ...OptiFormsContainerData
+    ...ArticlePageExcerpt
+    ...FormContainerData
 }

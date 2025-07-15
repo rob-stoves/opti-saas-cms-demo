@@ -1,8 +1,8 @@
-fragment textboxElement on OptiFormsTextboxElement {
+fragment textboxElement on OptiFormsDITextboxElement {
     Label
     Tooltip
     Placeholder
     AutoComplete
     PredefinedValue
-    Validators
+    # Validators
 }

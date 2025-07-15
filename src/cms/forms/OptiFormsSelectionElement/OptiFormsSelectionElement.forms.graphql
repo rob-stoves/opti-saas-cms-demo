@@ -1,8 +1,8 @@
-fragment selectionElement on OptiFormsSelectionElement {
+fragment selectionElement on OptiFormsDISelectionElement {
     Label
     Tooltip
-    Options
-    Validators
+    # Options
+    # Validators
     AllowMultiSelect
     AutoComplete
 }

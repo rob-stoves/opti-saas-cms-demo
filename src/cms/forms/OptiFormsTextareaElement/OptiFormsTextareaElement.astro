@@ -1,4 +1,7 @@
 ---
+// https://daisyui.com/components/textarea/
+
+
 import type { 
     DisplaySettingsFragment, OptiFormsDiTextboxElement } from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
@@ -13,7 +16,7 @@ export interface Props {
 }
 const { data, displaySettings } = Astro.props as Props;
 
-console.log('OptiFormsTextboxElement data:', JSON.stringify(data, null, 2));
+console.log('OptiFormsTextareaElement data:', JSON.stringify(data, null, 2));
 
 // export interface Props {
 //   Label?: string;
@@ -37,14 +40,14 @@ console.log('OptiFormsTextboxElement data:', JSON.stringify(data, null, 2));
 const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<!-- <fieldset class="fieldset">
+<h1>Textarea element!</h1>
+
+<!-- 
+<fieldset class="fieldset">
   <legend class="fieldset-legend">{Label}</legend>
-  <input type="text" class="input" placeholder={Placeholder} value={PredefinedValue} />
-  <p class="label">Optional</p> 
+  <textarea class="textarea h-24" placeholder={Placeholder} value={PredefinedValue}></textarea>
+  <div class="label">Optional</div>
 </fieldset> -->
-
-
-<h1>Textbox element!</h1>
 
 
 <!-- 

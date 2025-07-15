@@ -1,4 +1,4 @@
-fragment FormContainerData on OptiFormsContainerData {
+fragment FormContainerData on OptiFormsDIContainerData {
     SubmitConfirmationMessage
     ResetConfirmationMessage
     SubmitUrl {
