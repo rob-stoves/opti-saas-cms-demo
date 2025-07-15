@@ -1,4 +1,4 @@
-fragment numberElement on OptiFormsNumberElement {
+fragment numberElement on OptiFormsDINumberElement {
     Label
     Tooltip
     Placeholder

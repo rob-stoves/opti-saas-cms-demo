@@ -1,4 +1,4 @@
-fragment resetElement on OptiFormsResetElement {
+fragment resetElement on OptiFormsDIResetElement {
     Label
     Tooltip
 }

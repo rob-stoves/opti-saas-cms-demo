@@ -26,12 +26,15 @@ query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
                     displaySettings {
                         ...DisplaySettings
                     }
+                    nodeType
+                    type
                     ... on CompositionStructureNode {
-                        nodeType
                         key
+                        nodeType
                         rows: nodes {
                             ... on CompositionStructureNode {
                                 key
+                                nodeType
                                 displayTemplateKey
                                 displaySettings {
                                     ...DisplaySettings
@@ -39,6 +42,7 @@ query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
                                 columns: nodes {
                                     ... on CompositionStructureNode {
                                         key
+                                        nodeType
                                         displayTemplateKey
                                         displaySettings {
                                             ...DisplaySettings
@@ -46,6 +50,7 @@ query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
                                         nodes {
                                             ... on CompositionComponentNode {
                                                 key
+                                                nodeType
                                                 displayTemplateKey
                                                 displaySettings {
                                                     ...DisplaySettings

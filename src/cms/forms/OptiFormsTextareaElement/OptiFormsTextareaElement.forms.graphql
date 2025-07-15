@@ -1,4 +1,4 @@
-fragment textareaElement on OptiFormsTextareaElement {
+fragment textareaElement on OptiFormsDITextareaElement {
     Label
     Tooltip
     Placeholder

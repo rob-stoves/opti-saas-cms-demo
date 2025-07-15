@@ -1,51 +1,38 @@
 ---
-import type { 
-    DisplaySettingsFragment, OptiFormsDiTextboxElement } from '../../../../__generated/sdk';
-import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
-
-// https://daisyui.com/components/input/
-
+// https://daisyui.com/components/select/
 
 export interface Props {
-    data: OptiFormsDiTextboxElement;
-    contentPayload: ContentPayload;
-    displaySettings: DisplaySettingsFragment[];
+  Label?: string;
+  Tooltip?: string;
+  Placeholder?: string;
+  AutoComplete?: string;
+  PredefinedValue?: string;
+  Validators?: any;
 }
-const { data, displaySettings } = Astro.props as Props;
 
-console.log('OptiFormsTextboxElement data:', JSON.stringify(data, null, 2));
-
-// export interface Props {
-//   Label?: string;
-//   Tooltip?: string;
-//   Placeholder?: string;
-//   AutoComplete?: string;
-//   PredefinedValue?: string;
-//   Validators?: any;
-// }
-
-// const {
-//   Label,
-//   Tooltip,
-//   Placeholder,
-//   AutoComplete,
-//   PredefinedValue,
-//   Validators
-// } = Astro.props;
+const {
+  Label,
+  Tooltip,
+  Placeholder,
+  AutoComplete,
+  PredefinedValue,
+  Validators
+} = Astro.props;
 
 // Generate a unique ID for the input
 const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<!-- <fieldset class="fieldset">
+<fieldset class="fieldset">
   <legend class="fieldset-legend">{Label}</legend>
-  <input type="text" class="input" placeholder={Placeholder} value={PredefinedValue} />
-  <p class="label">Optional</p> 
-</fieldset> -->
-
-
-<h1>Textbox element!</h1>
-
+  <select class="select">
+    <option disabled selected>{Placeholder}</option>
+    <!-- <option>Chrome</option>
+    <option>FireFox</option>
+    <option>Safari</option> -->
+  </select>
+  <!-- <span class="label">Optional</span> -->
+</fieldset>
 
 <!-- 
 <div class="form-group">

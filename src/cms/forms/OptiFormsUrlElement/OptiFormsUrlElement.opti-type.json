@@ -1,5 +1,5 @@
 {
-    "key": "OptiFormsUrlElement",
+    "key": "OptiFormsDIUrlElement",
     "displayName": "",
     "description": "",
     "baseType": "component",
@@ -46,17 +46,6 @@
             "required": false,
             "group": "Information",
             "sortOrder": 400,
-            "editorSettings": {}
-        },
-        "Validators": {
-            "type": "json",
-            "format": "ValidatorListProperty",
-            "displayName": "",
-            "description": "",
-            "localized": false,
-            "required": false,
-            "group": "Information",
-            "sortOrder": 900,
             "editorSettings": {}
         }
     }

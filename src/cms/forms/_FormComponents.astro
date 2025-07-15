@@ -1,0 +1,37 @@
+---
+import type { ContentPayload } from '../../graphql/shared/ContentPayload';
+
+import OptiFormsTextboxElement from '../forms/OptiFormsTextboxElement/OptiFormsTextboxElement.astro';
+import OptiFormsTextareaElement from '../forms/OptiFormsTextareaElement/OptiFormsTextareaElement.astro';
+
+interface Props {
+    contentPayload: ContentPayload;
+    data: any;
+}
+
+const { contentPayload, data } = Astro.props as Props;
+const { component, displaySettings, displayTemplateKey } = data;
+const componentType = component._metadata.types[0];
+
+console.log('Component Type:', componentType);
+---
+
+{
+    componentType === 'OptiFormsDITextboxElement' && (
+        <OptiFormsTextboxElement
+            contentPayload={contentPayload}
+            data={component}
+            displaySettings={displaySettings}
+        />
+    )
+}
+
+{
+    componentType === 'OptiFormsDITextareaElement' && (
+        <OptiFormsTextareaElement
+            contentPayload={contentPayload}
+            data={component}
+            displaySettings={displaySettings}
+        />
+    )
+}

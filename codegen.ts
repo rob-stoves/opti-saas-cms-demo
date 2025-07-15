@@ -23,7 +23,6 @@ function buildDocumentArray() {
     const graphqlFiles = glob.sync(graphqlFilePath);
     
     if (OPTIMIZELY_DAM_ENABLED && !OPTIMIZELY_FORMS_ENABLED) {
-        console.log('OPTIMIZELY_DAM_ENABLED && !OPTIMIZELY_FORMS_ENABLED');
         // When DAM is enabled, prefer .dam.graphql files over regular ones
         const allCmsFiles = glob.sync('./src/cms/**/*.graphql');
         const allGraphqlFiles = [...graphqlFiles, ...allCmsFiles];
@@ -40,7 +39,6 @@ function buildDocumentArray() {
 
         return [...damFiles, ...finalFiles];
     } else if (OPTIMIZELY_FORMS_ENABLED && !OPTIMIZELY_DAM_ENABLED) {
-        console.log('OPTIMIZELY_FORMS_ENABLED && !OPTIMIZELY_DAM_ENABLED');
         // When Forms are enabled, prefer .forms.graphql files over regular ones
         const allCmsFiles = glob.sync('./src/cms/**/*.graphql');
         const allGraphqlFiles = [...graphqlFiles, ...allCmsFiles];
@@ -57,7 +55,6 @@ function buildDocumentArray() {
 
         return [...formsFiles, ...finalFiles];
     } else if (OPTIMIZELY_FORMS_ENABLED && OPTIMIZELY_DAM_ENABLED) {
-        console.log('OPTIMIZELY_FORMS_ENABLED && OPTIMIZELY_DAM_ENABLED');
         // When Forms are enabled, prefer .forms.graphql files over regular ones
         const allCmsFiles = glob.sync('./src/cms/**/*.graphql');
         const allGraphqlFiles = [...graphqlFiles, ...allCmsFiles];

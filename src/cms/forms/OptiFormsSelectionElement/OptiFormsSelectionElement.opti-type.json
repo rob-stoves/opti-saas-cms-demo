@@ -1,5 +1,5 @@
 {
-    "key": "OptiFormsSelectionElement",
+    "key": "OptiFormsDISelectionElement",
     "displayName": "",
     "description": "",
     "baseType": "component",
@@ -26,28 +26,6 @@
             "required": false,
             "group": "Information",
             "sortOrder": 300,
-            "editorSettings": {}
-        },
-        "Options": {
-            "type": "json",
-            "format": "OptionListProperty",
-            "displayName": "",
-            "description": "",
-            "localized": false,
-            "required": false,
-            "group": "Information",
-            "sortOrder": 800,
-            "editorSettings": {}
-        },
-        "Validators": {
-            "type": "json",
-            "format": "ValidatorListProperty",
-            "displayName": "",
-            "description": "",
-            "localized": false,
-            "required": false,
-            "group": "Information",
-            "sortOrder": 900,
             "editorSettings": {}
         },
         "AllowMultiSelect": {

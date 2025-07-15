@@ -1,5 +1,5 @@
-query Forms($key: String, $version: String) {
-    OptiFormsContainerData(
+query formById($key: String, $version: String) {
+    OptiFormsDIContainerData(
         where: {
             _metadata: { key: { eq: $key } }
             _or: { _metadata: { version: { eq: $version } } }
@@ -8,6 +8,14 @@ query Forms($key: String, $version: String) {
         items {
             composition {
                 grids: nodes {
+                    key
+                    displayName
+                    displayTemplateKey
+                    displaySettings {
+                        ...DisplaySettings
+                    }
+                    nodeType
+                    type
                     ... on CompositionStructureNode {
                         key
                         __typename
@@ -15,7 +23,7 @@ query Forms($key: String, $version: String) {
                         nodeType
                         layoutType
                         component {
-                            ..._IComponent
+                            ...AllComponents
                         }
                         nodes: nodes {
                             ... on CompositionStructureNode {
@@ -32,15 +40,17 @@ query Forms($key: String, $version: String) {
                                         nodeType
                                         layoutType
                                         nodes: nodes {
-                                            ...compositionComponentNode
-                                            ... on CompositionStructureNode {
+                                            ... on CompositionComponentNode {
                                                 key
-                                                __typename
-                                                displayName
-                                                nodeType
-                                                layoutType
-                                                nodes: nodes {
-                                                    ...compositionComponentNode
+                                                displayTemplateKey
+                                                displaySettings {
+                                                    ...DisplaySettings
+                                                }
+                                                component {
+                                                    _metadata {
+                                                        types
+                                                    }
+                                                    ...AllComponents
                                                 }
                                             }
                                         }

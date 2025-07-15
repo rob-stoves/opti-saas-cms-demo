@@ -1,16 +1,14 @@
 {
-    "key": "OptiFormsDIContainerData",
+    "key": "OptiFormsDIChoiceElement",
     "displayName": "",
     "description": "",
-    "baseType": "_section",
+    "baseType": "component",
     "sortOrder": 0,
     "mayContainTypes": [],
     "mediaFileExtensions": [],
-    "compositionBehaviors": [
-        "sectionEnabled"
-    ],
+    "compositionBehaviors": [],
     "properties": {
-        "Title": {
+        "Label": {
             "type": "string",
             "displayName": "",
             "description": "",
@@ -20,18 +18,8 @@
             "sortOrder": 100,
             "editorSettings": {}
         },
-        "Description": {
+        "Tooltip": {
             "type": "string",
-            "displayName": "",
-            "description": "",
-            "localized": true,
-            "required": false,
-            "group": "Information",
-            "sortOrder": 200,
-            "editorSettings": {}
-        },
-        "ShowSummaryMessageAfterSubmission": {
-            "type": "boolean",
             "displayName": "",
             "description": "",
             "localized": true,
@@ -40,34 +28,36 @@
             "sortOrder": 300,
             "editorSettings": {}
         },
-        "SubmitConfirmationMessage": {
-            "type": "string",
+        "Options": {
+            "type": "json",
+            "format": "OptionListProperty",
             "displayName": "",
             "description": "",
-            "localized": true,
+            "localized": false,
             "required": false,
             "group": "Information",
-            "sortOrder": 400,
+            "sortOrder": 800,
             "editorSettings": {}
         },
-        "ResetConfirmationMessage": {
-            "type": "string",
+        "Validators": {
+            "type": "json",
+            "format": "ValidatorListProperty",
             "displayName": "",
             "description": "",
-            "localized": true,
+            "localized": false,
             "required": false,
             "group": "Information",
-            "sortOrder": 500,
+            "sortOrder": 900,
             "editorSettings": {}
         },
-        "SubmitUrl": {
-            "type": "url",
+        "AllowMultiSelect": {
+            "type": "boolean",
             "displayName": "",
             "description": "",
-            "localized": true,
+            "localized": false,
             "required": false,
             "group": "Information",
-            "sortOrder": 600,
+            "sortOrder": 1000,
             "editorSettings": {}
         }
     }
