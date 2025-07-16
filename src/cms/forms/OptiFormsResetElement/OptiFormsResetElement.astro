@@ -1,0 +1,22 @@
+---
+import type { 
+    DisplaySettingsFragment, OptiFormsDiResetElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+
+import LinkButton from '../../components/ButtonComponent/LinkButton.astro';
+
+export interface Props {
+    data: OptiFormsDiResetElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Tooltip?: string;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Tooltip } = data;
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<LinkButton tooltip={Tooltip}>{Label}</LinkButton>

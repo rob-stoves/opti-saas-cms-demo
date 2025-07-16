@@ -1,24 +1,22 @@
 ---
 import type { 
-    DisplaySettingsFragment, OptiFormsDiTextboxElement } from '../../../../__generated/sdk';
+    DisplaySettingsFragment, OptiFormsDiUrlElement } from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
 
 // https://daisyui.com/components/input/
 
 
 export interface Props {
-    data: OptiFormsDiTextboxElement;
+    data: OptiFormsDiUrlElement;
     contentPayload: ContentPayload;
     displaySettings: DisplaySettingsFragment[];
     Label?: string;
     Tooltip?: string;
     Placeholder?: string;
-    AutoComplete?: string;
     PredefinedValue?: string;
-    Validators?: any;
 }
 const { data, displaySettings } = Astro.props as Props;
-const { Label, Tooltip, Placeholder, AutoComplete, PredefinedValue } = data;
+const { Label, Tooltip, Placeholder, PredefinedValue } = data;
 
 // Generate a unique ID for the input
 // const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
@@ -26,6 +24,8 @@ const { Label, Tooltip, Placeholder, AutoComplete, PredefinedValue } = data;
 
 <fieldset class="fieldset">
   <legend class="fieldset-legend">{Label}</legend>
-  <input type="text" class="input" placeholder={Placeholder} value={PredefinedValue} />
-  <!-- <p class="label">Optional</p>  -->
+  <input type="url" class="input validator" placeholder={Placeholder} value={PredefinedValue} 
+    pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
+    title="Must be valid URL" />
+  <p class="validator-hint">Must be valid URL</p>
 </fieldset>

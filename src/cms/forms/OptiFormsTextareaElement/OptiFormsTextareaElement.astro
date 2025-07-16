@@ -13,10 +13,17 @@ export interface Props {
     data: OptiFormsDiTextboxElement;
     contentPayload: ContentPayload;
     displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Tooltip?: string;
+    Placeholder?: string;
+    AutoComplete?: string;
+    PredefinedValue?: string;
+    Validators?: any;
 }
 const { data, displaySettings } = Astro.props as Props;
+const { Label, Tooltip, Placeholder, AutoComplete, PredefinedValue } = data;
 
-console.log('OptiFormsTextareaElement data:', JSON.stringify(data, null, 2));
+// console.log('OptiFormsTextareaElement data:', JSON.stringify(data, null, 2));
 
 // export interface Props {
 //   Label?: string;
@@ -40,14 +47,14 @@ console.log('OptiFormsTextareaElement data:', JSON.stringify(data, null, 2));
 const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<h1>Textarea element!</h1>
+<!-- <h1>Textarea element!</h1> -->
 
-<!-- 
+
 <fieldset class="fieldset">
   <legend class="fieldset-legend">{Label}</legend>
   <textarea class="textarea h-24" placeholder={Placeholder} value={PredefinedValue}></textarea>
-  <div class="label">Optional</div>
-</fieldset> -->
+  <!-- <div class="label">Optional</div> -->
+</fieldset>
 
 
 <!-- 

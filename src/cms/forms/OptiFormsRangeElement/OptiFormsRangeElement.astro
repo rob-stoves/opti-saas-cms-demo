@@ -1,0 +1,43 @@
+---
+import type { 
+    DisplaySettingsFragment, OptiFormsDiRangeElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+
+// https://daisyui.com/components/range/
+
+
+export interface Props {
+    data: OptiFormsDiRangeElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Tooltip?: string;
+    AutoComplete?: string;
+    PredefinedValue?: string;
+    Validators?: any;
+    Min?: number;
+    Max?: number;
+    Increment?: number;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Tooltip, PredefinedValue, Min, Max, Increment } = data;
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<fieldset class="fieldset">
+  <legend class="fieldset-legend">{Label}</legend>
+  <div class="w-full max-w-xs">
+    <input type="range" min={Min} max={Max} value={PredefinedValue} class="range" step={Increment} />
+    <div class="flex justify-between px-2.5 mt-2 text-xs">
+    </div>
+    <!-- <div class="flex justify-between px-2.5 mt-2 text-xs">
+      <span>1</span>
+      <span>2</span>
+      <span>3</span>
+      <span>4</span>
+      <span>5</span>
+    </div> -->
+  </div>
+</fieldset>

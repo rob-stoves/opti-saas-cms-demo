@@ -8,6 +8,9 @@ import type { ContentPayload } from '../../../../graphql/shared/ContentPayload';
 import { isEditContext } from '../../../shared/utils.ts';
 
 import FormComponents from '../../_FormComponents.astro';
+import { getRowStyles } from '../../../compositions/Row/RowHelper';
+import { getGlobalStyles } from '../../../shared/globalStylesHelper';
+import { getColumnStyles } from '../../../compositions/Column/ColumnHelper';
 
 const isCmsEdit = isEditContext(Astro.url);
 
@@ -28,18 +31,17 @@ const optiResponse = await getOptimizelySdk(contentPayload).formById({
     ver: contentPayload.ver,
 });
 
+let nodeStyles: any[] = [];
+let globalStyles: any[] = [];
 
-// console.log('OptiForm payload:', JSON.stringify(contentPayload, null, 2));
-// console.log('Optimizely Form Response:', JSON.stringify(optiResponse, null, 2));
-console.log('grid:', JSON.stringify(grid, null, 2));
-
-console.log('OptiForm nodeType:', nodeType);
-
-// const form = optiResponse?._Page?.item as ArticlePageFragment;
-// const publishedDate = format(
-//     new Date(post?._metadata?.published ?? Date.now()),
-//     'dd MMM yyyy'
-// );
+if (nodeType === 'row') {
+    nodeStyles = getRowStyles(grid);
+    globalStyles = getGlobalStyles(grid);
+} else if (nodeType === 'column') {
+    nodeStyles = getColumnStyles(grid);
+    globalStyles = getGlobalStyles(grid);
+}
+const styles = [...nodeStyles, ...globalStyles]
 
 ---
 
@@ -60,7 +62,8 @@ console.log('OptiForm nodeType:', nodeType);
 }
 
 { nodeType === 'row' && 
-    <div class="flex flex-row flex-wrap justify-start vb:row gap-4" data-epi-block-id={grid.key}>
+    <div class="flex flex-row flex-wrap justify-start vb:row gap-4" 
+        class:list={styles} data-epi-block-id={grid.key}>
         {grid.columns?.map((column: any) => (
             <Astro.self contentPayload={contentPayload} grid={column} />
         ))}
@@ -68,7 +71,8 @@ console.log('OptiForm nodeType:', nodeType);
 }
 
 { nodeType === 'column' && 
-    <div class="flex flex-row flex-wrap justify-start vb:row gap-4" data-epi-block-id={grid.key}>
+    <div class="flex-1 flex flex-col flex-nowrap justify-start vb:col" 
+        class:list={styles} data-epi-block-id={grid.key}>
         {grid.nodes?.map((item: any) => (
             <FormComponents contentPayload={contentPayload} data={item} />
         ))}
