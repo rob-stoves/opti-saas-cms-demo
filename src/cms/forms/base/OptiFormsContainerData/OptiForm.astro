@@ -24,12 +24,12 @@ const nodeType = grid.nodeType;
 
 contentPayload.key = grid.key;
 
-const optiResponse = await getOptimizelySdk(contentPayload).formById({
-    key: contentPayload.key,
-    //@ts-ignore
-    loc: contentPayload.loc as Locales,
-    ver: contentPayload.ver,
-});
+// const optiResponse = await getOptimizelySdk(contentPayload).formById({
+//     key: contentPayload.key,
+//     //@ts-ignore
+//     loc: contentPayload.loc as Locales,
+//     ver: contentPayload.ver,
+// });
 
 let nodeStyles: any[] = [];
 let globalStyles: any[] = [];
