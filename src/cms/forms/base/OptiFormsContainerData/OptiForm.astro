@@ -43,13 +43,26 @@ if (nodeType === 'row') {
 }
 const styles = [...nodeStyles, ...globalStyles]
 
+const formTitle = grid.component?.Title || null;
+const formDescription = grid.component?.Description || null;
 ---
 
 { nodeType === 'section' && 
     <div class="flex flex-col vb:section" data-epi-block-id={grid.key}>
-        {grid.rows?.map((rows: any) => (
-            <Astro.self contentPayload={contentPayload} grid={rows} />
-        ))}
+        { grid.nodes?.map((node: any) => (
+            <Astro.self contentPayload={contentPayload} grid={node} />
+        )) }
+        <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full mx-auto">
+            { formTitle && 
+                <h2 class="text-2xl font-bold mb-4">{formTitle}</h2>
+            }
+            { formDescription && 
+                <p class="mb-4">{formDescription}</p>
+            }
+            {grid.rows?.map((rows: any) => (
+                <Astro.self contentPayload={contentPayload} grid={rows} />
+            ))}
+        </form>
     </div>
 }
 

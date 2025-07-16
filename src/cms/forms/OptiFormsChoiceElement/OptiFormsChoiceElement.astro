@@ -26,8 +26,8 @@ const { Label, Tooltip, AllowMultiSelect } = data;
 ---
 
 {AllowMultiSelect && (
-  <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-64 border p-4">
-    <legend class="fieldset-legend">{Label}</legend>
+  <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
+    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
     <label class="label">
       <input type="checkbox" class="checkbox" />
       Option 1
@@ -46,8 +46,8 @@ const { Label, Tooltip, AllowMultiSelect } = data;
 
 <!-- Change to https://daisyui.com/components/filter/ ? -->
 {!AllowMultiSelect && (
-  <fieldset class="fieldset bg-base-100 border-base-300 w-64 border p-4">
-    <legend class="fieldset-legend">{Label}</legend>
+  <fieldset class="fieldset bg-base-100 border-base-300 w-full border p-4">
+    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
     <label class="label">
       <input type="radio" name="radio-1" class="radio" checked="checked" />
       Option 1

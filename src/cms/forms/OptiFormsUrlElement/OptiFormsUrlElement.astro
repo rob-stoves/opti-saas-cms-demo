@@ -22,10 +22,10 @@ const { Label, Tooltip, Placeholder, PredefinedValue } = data;
 // const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<fieldset class="fieldset">
-  <legend class="fieldset-legend">{Label}</legend>
-  <input type="url" class="input validator" placeholder={Placeholder} value={PredefinedValue} 
+<fieldset class="fieldset w-full">
+  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+  <input type="url" class="input validator w-full" placeholder={Placeholder} value={PredefinedValue} 
     pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
     title="Must be valid URL" />
-  <p class="validator-hint">Must be valid URL</p>
+  <!-- <p class="validator-hint">Must be valid URL</p> -->
 </fieldset>
