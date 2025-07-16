@@ -1,11 +1,23 @@
-query formById($key: String, $version: String) {
-    OptiFormsDIContainerData(
-        where: {
-            _metadata: { key: { eq: $key } }
-            _or: { _metadata: { version: { eq: $version } } }
-        }
+query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
+    _Experience(
+        ids: $key
+        locale: $loc
+        where: { _metadata: { version: { eq: $ver } } }
+        variation: { include: ALL }
     ) {
-        items {
+        item {
+            _metadata {
+                key
+                version
+                url {
+                    default
+                    hierarchical
+                    type
+                }
+                types
+                displayName
+            }
+            ...BlankExperienceSeo
             composition {
                 grids: nodes {
                     key
@@ -18,30 +30,27 @@ query formById($key: String, $version: String) {
                     type
                     ... on CompositionStructureNode {
                         key
-                        __typename
-                        displayName
                         nodeType
-                        layoutType
-                        component {
-                            ...AllComponents
-                        }
-                        nodes: nodes {
+                        rows: nodes {
                             ... on CompositionStructureNode {
                                 key
-                                __typename
-                                displayName
                                 nodeType
-                                layoutType
-                                nodes: nodes {
+                                displayTemplateKey
+                                displaySettings {
+                                    ...DisplaySettings
+                                }
+                                columns: nodes {
                                     ... on CompositionStructureNode {
                                         key
-                                        __typename
-                                        displayName
                                         nodeType
-                                        layoutType
-                                        nodes: nodes {
+                                        displayTemplateKey
+                                        displaySettings {
+                                            ...DisplaySettings
+                                        }
+                                        nodes {
                                             ... on CompositionComponentNode {
                                                 key
+                                                nodeType
                                                 displayTemplateKey
                                                 displaySettings {
                                                     ...DisplaySettings
@@ -50,6 +59,7 @@ query formById($key: String, $version: String) {
                                                     _metadata {
                                                         types
                                                     }
+                                                    ...AllComponents
                                                     ...AllFormComponents
                                                 }
                                             }
@@ -59,11 +69,21 @@ query formById($key: String, $version: String) {
                             }
                         }
                     }
+                    ... on CompositionComponentNode {
+                        nodeType
+                        key
+                        displayTemplateKey
+                        displaySettings {
+                            ...DisplaySettings
+                        }
+                        component {
+                            _metadata {
+                                types
+                            }
+                            ...AllComponents
+                        }
+                    }
                 }
-            }
-            _metadata {
-                key
-                version
             }
         }
     }
