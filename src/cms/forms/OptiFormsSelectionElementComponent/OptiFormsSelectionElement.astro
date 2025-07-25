@@ -1,0 +1,35 @@
+---
+// https://daisyui.com/components/select/
+
+import type { 
+    DisplaySettingsFragment, OptiFormsSelectionElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import { isRequiredValidator } from '../formHelper';
+
+export interface Props {
+    data: OptiFormsSelectionElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Tooltip?: string;
+    Options?: any;
+    Validators?: any;
+    AllowMultiSelect?: boolean;
+    AutoComplete?: string;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Tooltip, Options, Validators, AllowMultiSelect, AutoComplete } = data;
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<fieldset class="fieldset w-full">
+  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+  <select class="select w-full">
+    <option disabled selected>{Tooltip}</option>
+    <option>Chrome</option>
+    <option>FireFox</option>
+    <option>Safari</option>
+  </select>
+</fieldset>

@@ -1,8 +1,0 @@
-fragment selectionElement on OptiFormsDISelectionElement {
-    Label
-    Tooltip
-    # Options
-    # Validators
-    AllowMultiSelect
-    AutoComplete
-}

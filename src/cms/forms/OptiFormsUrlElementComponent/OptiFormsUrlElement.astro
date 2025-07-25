@@ -1,0 +1,39 @@
+---
+import type { 
+    DisplaySettingsFragment, OptiFormsUrlElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import { isRequiredValidator } from '../formHelper';
+
+// https://daisyui.com/components/input/
+//// Style ideas:
+// Show icon
+
+export interface Props {
+    data: OptiFormsUrlElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Placeholder?: string;
+    Tooltip?: string;
+    PredefinedValue?: string;
+    Validators?: any;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Placeholder, Tooltip, PredefinedValue, Validators } = data;
+
+const isRequired = isRequiredValidator(Validators);
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<fieldset class="fieldset w-full">
+  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+  <input type="url" class="input validator w-full" 
+    required={isRequired}
+    placeholder={Placeholder} 
+    value={PredefinedValue} 
+    pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
+    title={Tooltip} />
+  <!-- <p class="validator-hint">Must be valid URL</p> -->
+</fieldset>

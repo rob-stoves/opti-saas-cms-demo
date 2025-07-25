@@ -1,0 +1,38 @@
+---
+import type { 
+    DisplaySettingsFragment, OptiFormsNumberElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import { isRequiredValidator } from '../formHelper';
+
+// https://daisyui.com/components/input/
+
+
+export interface Props {
+    data: OptiFormsNumberElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Placeholder?: string;
+    Tooltip?: string;
+    PredefinedValue?: string;
+    Validators?: any;
+    AutoComplete?: string;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Placeholder, Tooltip, PredefinedValue, Validators, AutoComplete } = data;
+
+const isRequired = isRequiredValidator(Validators);
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<fieldset class="fieldset w-full">
+  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+  <input type="number" class="input validator w-full" 
+    placeholder={Placeholder} 
+    value={PredefinedValue} 
+    title={Tooltip}
+    autocomplete={AutoComplete || "off"} />
+  <!-- <p class="validator-hint">Please enter a number</p> -->
+</fieldset>

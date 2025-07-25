@@ -1,0 +1,74 @@
+{
+    "key": "OptiFormsContainerData",
+    "displayName": "",
+    "description": "",
+    "baseType": "section",
+    "sortOrder": 0,
+    "mayContainTypes": [],
+    "mediaFileExtensions": [],
+    "compositionBehaviors": [
+        "sectionEnabled"
+    ],
+    "properties": {
+        "Title": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 100,
+            "editorSettings": {}
+        },
+        "Description": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 200,
+            "editorSettings": {}
+        },
+        "ShowSummaryMessageAfterSubmission": {
+            "type": "boolean",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 300,
+            "editorSettings": {}
+        },
+        "SubmitConfirmationMessage": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 400,
+            "editorSettings": {}
+        },
+        "ResetConfirmationMessage": {
+            "type": "string",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 500,
+            "editorSettings": {}
+        },
+        "SubmitUrl": {
+            "type": "url",
+            "displayName": "",
+            "description": "",
+            "localized": true,
+            "required": false,
+            "group": "Information",
+            "sortOrder": 600,
+            "editorSettings": {}
+        }
+    }
+}

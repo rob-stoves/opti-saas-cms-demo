@@ -1,8 +1,0 @@
-fragment rangeElement on OptiFormsDIRangeElement {
-    Label
-    Tooltip
-    PredefinedValue
-    Min
-    Max
-    Increment
-}

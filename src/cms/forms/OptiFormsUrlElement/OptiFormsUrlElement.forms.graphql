@@ -1,7 +1,0 @@
-fragment urlElement on OptiFormsDIUrlElement {
-    Label
-    Tooltip
-    Placeholder
-    PredefinedValue
-    # Validators
-}

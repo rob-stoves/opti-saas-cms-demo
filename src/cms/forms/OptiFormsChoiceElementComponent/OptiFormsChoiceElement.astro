@@ -1,0 +1,61 @@
+---
+import type { 
+    DisplaySettingsFragment, OptiFormsChoiceElement } from '../../../../__generated/sdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+
+// https://daisyui.com/components/input/
+
+
+export interface Props {
+    data: OptiFormsChoiceElement;
+    contentPayload: ContentPayload;
+    displaySettings: DisplaySettingsFragment[];
+    Label?: string;
+    Tooltip?: string;
+    Options?: any;
+    Validators?: any;
+    AllowMultiSelect?: boolean;
+}
+const { data, displaySettings } = Astro.props as Props;
+const { Label, Tooltip, Options, Validators, AllowMultiSelect } = data;
+
+// Generate a unique ID for the input
+// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+{AllowMultiSelect && 
+    <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
+      <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+      <label class="label">
+        <input type="checkbox" class="checkbox" />
+        Option 1
+      </label>
+      <label class="label">
+        <input type="checkbox" class="checkbox" />
+        Option 2
+      </label>
+      <label class="label">
+        <input type="checkbox" class="checkbox" />
+        Option 3
+      </label>
+    </fieldset>
+}
+
+<!-- Change to https://daisyui.com/components/filter/ ? -->
+{!AllowMultiSelect &&
+  <fieldset class="fieldset bg-base-100 border-base-300 w-full border p-4">
+    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+    <label class="label">
+      <input type="radio" name="radio-1" class="radio" checked="checked" />
+      Option 1
+    </label>
+    <label class="label">
+      <input type="radio" name="radio-1" class="radio" />
+      Option 2
+    </label>
+    <label class="label">
+      <input type="radio" name="radio-1" class="radio" />
+      Option 3
+    </label>
+  </fieldset>
+}
