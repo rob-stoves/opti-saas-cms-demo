@@ -4,6 +4,7 @@
 # }
 
 fragment AllFormComponents on _IComponent {
+    ...formContainerData
     ...choiceElement
     ...numberElement
     ...rangeElement

@@ -1,4 +1,0 @@
-fragment submitElement on OptiFormsDISubmitElement {
-    Label
-    Tooltip
-}

@@ -1,15 +1,15 @@
 ---
 import type { ContentPayload } from '../../graphql/shared/ContentPayload';
 
-import OptiFormsTextboxElement from '../forms/OptiFormsTextboxElement/OptiFormsTextboxElement.astro';
-import OptiFormsNumberElement from '../forms/OptiFormsNumberElement/OptiFormsNumberElement.astro';
-import OptiFormsRangeElement from '../forms/OptiFormsRangeElement/OptiFormsRangeElement.astro';
-import OptiFormsSelectionElement from '../forms/OptiFormsSelectionElement/OptiFormsSelectionElement.astro';
-import OptiFormsTextareaElement from '../forms/OptiFormsTextareaElement/OptiFormsTextareaElement.astro';
-import OptiFormsUrlElement from '../forms/OptiFormsUrlElement/OptiFormsUrlElement.astro';
-import OptiFormsChoiceElement from '../forms/OptiFormsChoiceElement/OptiFormsChoiceElement.astro';
-import OptiFormsSubmitElement from '../forms/OptiFormsSubmitElement/OptiFormsSubmitElement.astro';
-import OptiFormsResetElement from '../forms/OptiFormsResetElement/OptiFormsResetElement.astro';
+import OptiFormsTextboxElement from '../forms/OptiFormsTextboxElementComponent/OptiFormsTextboxElement.astro';
+import OptiFormsNumberElement from '../forms/OptiFormsNumberElementComponent/OptiFormsNumberElement.astro';
+import OptiFormsRangeElement from '../forms/OptiFormsRangeElementComponent/OptiFormsRangeElement.astro';
+import OptiFormsSelectionElement from '../forms/OptiFormsSelectionElementComponent/OptiFormsSelectionElement.astro';
+import OptiFormsTextareaElement from '../forms/OptiFormsTextareaElementComponent/OptiFormsTextareaElement.astro';
+import OptiFormsUrlElement from '../forms/OptiFormsUrlElementComponent/OptiFormsUrlElement.astro';
+import OptiFormsChoiceElement from '../forms/OptiFormsChoiceElementComponent/OptiFormsChoiceElement.astro';
+import OptiFormsSubmitElement from '../forms/OptiFormsSubmitElementComponent/OptiFormsSubmitElement.astro';
+import OptiFormsResetElement from '../forms/OptiFormsResetElementComponent/OptiFormsResetElement.astro';
 
 interface Props {
     contentPayload: ContentPayload;
@@ -20,11 +20,11 @@ const { contentPayload, data } = Astro.props as Props;
 const { component, displaySettings, displayTemplateKey } = data;
 const componentType = component._metadata.types[0];
 
-// console.log('Component Type:', componentType);
+// console.log('_FormComponents data:', JSON.stringify(data, null, 2));
 ---
 
 {
-    componentType === 'OptiFormsDITextboxElement' && (
+    componentType === 'OptiFormsTextboxElement' && (
         <OptiFormsTextboxElement
             contentPayload={contentPayload}
             data={component}
@@ -34,7 +34,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDITextareaElement' && (
+    componentType === 'OptiFormsTextareaElement' && (
         <OptiFormsTextareaElement
             contentPayload={contentPayload}
             data={component}
@@ -44,7 +44,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDINumberElement' && (
+    componentType === 'OptiFormsNumberElement' && (
         <OptiFormsNumberElement
             contentPayload={contentPayload}
             data={component}
@@ -53,7 +53,7 @@ const componentType = component._metadata.types[0];
     )
 }
 {
-    componentType === 'OptiFormsDIUrlElement' && (
+    componentType === 'OptiFormsUrlElement' && (
         <OptiFormsUrlElement
             contentPayload={contentPayload}
             data={component}
@@ -63,7 +63,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDISelectionElement' && (
+    componentType === 'OptiFormsSelectionElement' && (
         <OptiFormsSelectionElement
             contentPayload={contentPayload}
             data={component}
@@ -73,7 +73,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDIRangeElement' && (
+    componentType === 'OptiFormsRangeElement' && (
         <OptiFormsRangeElement
             contentPayload={contentPayload}
             data={component}
@@ -83,7 +83,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDIChoiceElement' && (
+    componentType === 'OptiFormsChoiceElement' && (
         <OptiFormsChoiceElement
             contentPayload={contentPayload}
             data={component}
@@ -93,7 +93,7 @@ const componentType = component._metadata.types[0];
 }
 
 {
-    componentType === 'OptiFormsDISubmitElement' && (
+    componentType === 'OptiFormsSubmitElement' && (
         <OptiFormsSubmitElement
             contentPayload={contentPayload}
             data={component}
@@ -102,7 +102,7 @@ const componentType = component._metadata.types[0];
     )
 }
 {
-    componentType === 'OptiFormsDIResetElement' && (
+    componentType === 'OptiFormsResetElement' && (
         <OptiFormsResetElement
             contentPayload={contentPayload}
             data={component}
