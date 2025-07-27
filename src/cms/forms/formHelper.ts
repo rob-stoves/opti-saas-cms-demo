@@ -4,6 +4,16 @@ interface Validator {
     regularExpression?: string;
 }
 
+
+//// VALIDATORS
+// Sample of validators JSON structure:
+// [{
+// 	{"type":"requirevalidator","errorMessage":"This field is required."},
+// 	{"type":"emailvalidator","errorMessage":"Enter a valid email address."},
+// 	{"type":"numbervalidator","errorMessage":"Invalid number."},
+// 	{"type":"regularexpressionvalidator","errorMessage":"This field should be in \\"{0}\\" format.","regularExpression":"s"}
+// }]
+
 function parseValidators(validators?: any): Validator[] {
     if (!validators) return [];
     
