@@ -4,7 +4,6 @@ interface Validator {
     regularExpression?: string;
 }
 
-
 //// VALIDATORS
 // Sample of validators JSON structure:
 // [{
@@ -14,49 +13,57 @@ interface Validator {
 // 	{"type":"regularexpressionvalidator","errorMessage":"This field should be in \\"{0}\\" format.","regularExpression":"s"}
 // }]
 
-function parseValidators(validators?: any): Validator[] {
-    if (!validators) return [];
-    
-    // If it's already an array, return it
-    if (Array.isArray(validators)) return validators;
-    
-    // If it's a string, try to parse it as JSON
-    if (typeof validators === 'string') {
-        try {
-            const parsed = JSON.parse(validators);
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-            console.error('Failed to parse validators JSON:', error);
-            return [];
-        }
+export function isRequiredValidator(validators?: any): string | undefined {
+    const requiredValidator = validators.find(
+        (item: Validator) => item.type === 'requirevalidator'
+    );
+
+    if (requiredValidator) {
+        return requiredValidator?.errorMessage;
     }
-    
-    return [];
+    return undefined;
 }
 
-export function isRequiredValidator(validators?: any): boolean {
-    const parsedValidators = parseValidators(validators);
-    return parsedValidators.some(validator => validator.type === "requirevalidator");
+export function isEmailValidator(validators?: any): string | undefined {
+    const emailValidator = validators.find(
+        (item: Validator) => item.type === 'emailvalidator'
+    );
+
+    if (emailValidator) {
+        return emailValidator?.errorMessage;
+    }
+    return undefined;
 }
 
-export function isEmailValidator(validators?: any): boolean {
-    const parsedValidators = parseValidators(validators);
-    return parsedValidators.some(validator => validator.type === "emailvalidator");
+export function isNumberValidator(validators?: any): string | undefined {
+    const numberValidator = validators.find(
+        (item: Validator) => item.type === 'numbervalidator'
+    );
+
+    if (numberValidator) {
+        return numberValidator?.errorMessage;
+    }
+    return undefined;
 }
 
-export function isNumberValidator(validators?: any): boolean {
-    const parsedValidators = parseValidators(validators);
-    return parsedValidators.some(validator => validator.type === "numbervalidator");
+export function isRegExpValidator(validators?: any): string | undefined {
+    const regExpValidator = validators.find(
+        (item: Validator) => item.type === 'regularexpressionvalidator'
+    );
+
+    if (regExpValidator) {
+        return regExpValidator?.errorMessage;
+    }
+    return undefined;
 }
 
-export function isRegExpValidator(validators?: any): boolean {
-    const parsedValidators = parseValidators(validators);
-    return parsedValidators.some(validator => validator.type === "regularexpressionvalidator");
-}
+export function getRegularExpression(validators?: any): string | undefined {
+    const regExpValidator = validators.find(
+        (item: Validator) => item.type === 'regularexpressionvalidator'
+    );
 
-export function getRegularExpression(validators?: any): string {
-    const parsedValidators = parseValidators(validators);
-    // const regularExpressionValue = getRegularExpression(validators);
-    const regularExpressionValue = "x";
-    return regularExpressionValue;
+    if (regExpValidator) {
+        return regExpValidator?.regularExpressionValue;
+    }
+    return undefined;
 }
