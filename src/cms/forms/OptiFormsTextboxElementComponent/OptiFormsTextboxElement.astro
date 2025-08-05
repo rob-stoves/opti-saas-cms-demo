@@ -1,11 +1,18 @@
 ---
-import type { 
-    DisplaySettingsFragment, OptiFormsTextboxElement } from '../../../../__generated/sdk';
+import type {
+    DisplaySettingsFragment,
+    OptiFormsTextboxElement,
+} from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
-import { isRequiredValidator, isEmailValidator, isNumberValidator, isRegExpValidator, getRegularExpression } from '../formHelper';
+import {
+    isRequiredValidator,
+    isEmailValidator,
+    isNumberValidator,
+    isRegExpValidator,
+    getRegularExpression,
+} from '../formHelper';
 
 // https://daisyui.com/components/input/
-
 
 export interface Props {
     data: OptiFormsTextboxElement;
@@ -19,20 +26,36 @@ export interface Props {
     AutoComplete?: string;
 }
 const { data, displaySettings } = Astro.props as Props;
-const { Label, Placeholder, Tooltip, PredefinedValue, Validators, AutoComplete } = data;
+const {
+    Label,
+    Placeholder,
+    Tooltip,
+    PredefinedValue,
+    Validators,
+    AutoComplete,
+} = data;
 
 const isRequired = isRequiredValidator(Validators);
-const isEmail = isEmailValidator(Validators);
-const isNumber = isNumberValidator(Validators);
+const isEmailErrorMsg = isEmailValidator(Validators);
+const isNumberErrorMsg = isNumberValidator(Validators);
 const isRegExp = isRegExpValidator(Validators);
+
+// console.log('Textbox Element Data:', JSON.stringify(data, null, 2));
+// console.log('Textbox Validators:', JSON.stringify(Validators, null, 2));
 
 // Parse validators first, then use the helper function
 const regularExpressionValue = getRegularExpression(Validators);
 
-const inputType = isEmail ? 'email' : isNumber ? 'number' : 'text';
-const validatorHint = isEmail ? 'Enter valid email address'
-    : isNumber ? 'Enter valid number'
-    : isRegExp ? regularExpressionValue : '';
+const inputType =
+    (isEmailErrorMsg && 'email') || (isNumberErrorMsg && 'number') || 'text';
+//  : isNumber ? 'number' : 'text';
+// const validatorHint = isEmail
+//     ? 'Enter valid email address'
+//     : isNumber
+//       ? 'Enter valid number'
+//       : isRegExp
+//         ? regularExpressionValue
+//         : '';
 
 // console.log("Textbox Element Data:", JSON.stringify(data, null, 2));
 // Generate a unique ID for the input
@@ -40,14 +63,16 @@ const validatorHint = isEmail ? 'Enter valid email address'
 ---
 
 <fieldset class="fieldset w-full">
-  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
-  <input type={inputType} 
-    class="input w-full"
-    required={isRequired}
-    placeholder={Placeholder} 
-    value={PredefinedValue} 
-    autocomplete={AutoComplete || "off"}
-    pattern={regularExpressionValue || ''}
-    title={Tooltip} />
-  <!-- <p class="label">Optional</p>  -->
+    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+    <input
+        type={inputType}
+        class="input w-full"
+        required={isRequired}
+        placeholder={Placeholder}
+        value={PredefinedValue}
+        autocomplete={AutoComplete || 'off'}
+        pattern={regularExpressionValue || ''}
+        title={Tooltip}
+    />
+    <!-- <p class="label">Optional</p>  -->
 </fieldset>
