@@ -13,10 +13,10 @@ interface Validator {
 // 	{"type":"regularexpressionvalidator","errorMessage":"This field should be in \\"{0}\\" format.","regularExpression":"s"}
 // }]
 
-export function isRequiredValidator(validators?: any): string | undefined {
-    const requiredValidator = validators.find(
-        (item: Validator) => item.type === 'requirevalidator'
-    );
+export function requiredValidatorMsg(validators?: any): string | undefined {
+    const requiredValidator = Array.isArray(validators)
+        ? validators.find((item: Validator) => item.type === 'requirevalidator')
+        : undefined;
 
     if (requiredValidator) {
         return requiredValidator?.errorMessage;
@@ -24,10 +24,10 @@ export function isRequiredValidator(validators?: any): string | undefined {
     return undefined;
 }
 
-export function isEmailValidator(validators?: any): string | undefined {
-    const emailValidator = validators.find(
-        (item: Validator) => item.type === 'emailvalidator'
-    );
+export function emailValidatorMsg(validators?: any): string | undefined {
+    const emailValidator = Array.isArray(validators)
+        ? validators.find((item: Validator) => item.type === 'emailvalidator')
+        : undefined;
 
     if (emailValidator) {
         return emailValidator?.errorMessage;
@@ -35,10 +35,10 @@ export function isEmailValidator(validators?: any): string | undefined {
     return undefined;
 }
 
-export function isNumberValidator(validators?: any): string | undefined {
-    const numberValidator = validators.find(
-        (item: Validator) => item.type === 'numbervalidator'
-    );
+export function numberValidatorMsg(validators?: any): string | undefined {
+    const numberValidator = Array.isArray(validators)
+        ? validators.find((item: Validator) => item.type === 'numbervalidator')
+        : undefined;
 
     if (numberValidator) {
         return numberValidator?.errorMessage;
@@ -46,10 +46,12 @@ export function isNumberValidator(validators?: any): string | undefined {
     return undefined;
 }
 
-export function isRegExpValidator(validators?: any): string | undefined {
-    const regExpValidator = validators.find(
-        (item: Validator) => item.type === 'regularexpressionvalidator'
-    );
+export function regExpValidatorMsg(validators?: any): string | undefined {
+    const regExpValidator = Array.isArray(validators)
+        ? validators.find(
+              (item: Validator) => item.type === 'regularexpressionvalidator'
+          )
+        : undefined;
 
     if (regExpValidator) {
         return regExpValidator?.errorMessage;
@@ -58,9 +60,11 @@ export function isRegExpValidator(validators?: any): string | undefined {
 }
 
 export function getRegularExpression(validators?: any): string | undefined {
-    const regExpValidator = validators.find(
-        (item: Validator) => item.type === 'regularexpressionvalidator'
-    );
+    const regExpValidator = Array.isArray(validators)
+        ? validators.find(
+              (item: Validator) => item.type === 'regularexpressionvalidator'
+          )
+        : undefined;
 
     if (regExpValidator) {
         return regExpValidator?.regularExpressionValue;

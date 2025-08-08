@@ -5,10 +5,10 @@ import type {
 } from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
 import {
-    isRequiredValidator,
-    isEmailValidator,
-    isNumberValidator,
-    isRegExpValidator,
+    requiredValidatorMsg,
+    emailValidatorMsg,
+    numberValidatorMsg,
+    regExpValidatorMsg,
     getRegularExpression,
 } from '../formHelper';
 
@@ -35,16 +35,14 @@ const {
     AutoComplete,
 } = data;
 
-const isRequired = isRequiredValidator(Validators);
-const isEmailErrorMsg = isEmailValidator(Validators);
-const isNumberErrorMsg = isNumberValidator(Validators);
-const isRegExp = isRegExpValidator(Validators);
+const isRequiredErrorMsg = requiredValidatorMsg(Validators);
+const isEmailErrorMsg = emailValidatorMsg(Validators);
+const isNumberErrorMsg = numberValidatorMsg(Validators);
+const isRegExpErrorMsg = regExpValidatorMsg(Validators);
 
-// console.log('Textbox Element Data:', JSON.stringify(data, null, 2));
-// console.log('Textbox Validators:', JSON.stringify(Validators, null, 2));
-
-// Parse validators first, then use the helper function
-const regularExpressionValue = getRegularExpression(Validators);
+const regularExpressionValue = isRegExpErrorMsg
+    ? getRegularExpression(Validators)
+    : undefined;
 
 const inputType =
     (isEmailErrorMsg && 'email') || (isNumberErrorMsg && 'number') || 'text';
@@ -57,22 +55,35 @@ const inputType =
 //         ? regularExpressionValue
 //         : '';
 
-// console.log("Textbox Element Data:", JSON.stringify(data, null, 2));
-// Generate a unique ID for the input
-// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 ---
 
+<label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
+<input
+    id={inputId}
+    type={inputType}
+    class="input w-full"
+    required={isRequiredErrorMsg ? true : false}
+    placeholder={Placeholder}
+    value={PredefinedValue}
+    autocomplete={AutoComplete || 'off'}
+    pattern={regularExpressionValue || ''}
+    title={Tooltip}
+/>
+<!-- <p class="label">Optional</p>  -->
+
+<!-- 
 <fieldset class="fieldset w-full">
     <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
     <input
         type={inputType}
         class="input w-full"
-        required={isRequired}
+        required={isRequiredErrorMsg ? true : false}
         placeholder={Placeholder}
         value={PredefinedValue}
         autocomplete={AutoComplete || 'off'}
         pattern={regularExpressionValue || ''}
         title={Tooltip}
     />
-    <!-- <p class="label">Optional</p>  -->
-</fieldset>
+    <p class="label">Optional</p>
+</fieldset> -->
