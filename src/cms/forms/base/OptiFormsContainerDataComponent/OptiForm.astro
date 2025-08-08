@@ -21,10 +21,6 @@ export interface Props {
 const { grid, contentPayload } = Astro.props as Props;
 const nodeType = grid.nodeType;
 
-// console.log('OptiForm grid:', JSON.stringify(grid, null, 2));
-
-// console.log('OptiForm contentPayload:', JSON.stringify(contentPayload, null, 2));
-
 nodeType && (contentPayload.key = grid.key);
 
 const optiResponse =
@@ -35,13 +31,21 @@ const optiResponse =
         loc: contentPayload.loc as Locales,
         ver: contentPayload.ver,
     }));
-// console.log('OptiForm optiResponse:', JSON.stringify(optiResponse, null, 2));
 
-// const formGrid = optiResponse ? optiResponse?._Component?.item?.composition : grid;
-// const formNodes = optiResponse ? optiResponse?._Component?.item?.composition?.nodes : grid.nodes;
+const formGrid = optiResponse
+    ? 'composition' in (optiResponse?._Component?.item ?? {})
+        ? (optiResponse?._Component?.item as { composition?: any }).composition
+        : optiResponse?._Component?.item
+    : grid;
+const formNodes = optiResponse
+    ? 'composition' in (optiResponse?._Component?.item ?? {})
+        ? (optiResponse?._Component?.item as { composition?: any }).composition
+              ?.nodes
+        : (optiResponse?._Component?.item as any)?.nodes
+    : grid.nodes;
 
-const formGrid = grid;
-const formNodes = grid.nodes;
+// const formGrid = grid;
+// const formNodes = grid.nodes;
 
 // if (nodeType === 'column') { console.log('OptiForm column grid:', JSON.stringify(formGrid, null, 2)); }
 
@@ -62,8 +66,6 @@ const styles = [...nodeStyles, ...globalStyles];
 const formTitle = formGrid.component?.Title || formGrid.Title || null;
 const formDescription =
     formGrid.component?.Description || formGrid.Description || null;
-
-// console.log('OptiForm optiResponse:', JSON.stringify(optiResponse, null, 2));
 ---
 
 {
@@ -119,6 +121,16 @@ const formDescription =
         </div>
     )
 }
+
+<style is:inline>
+    input:invalid {
+        border: 2px dashed red;
+    }
+
+    input:valid {
+        border: 2px solid black;
+    }
+</style>
 
 {
     /*

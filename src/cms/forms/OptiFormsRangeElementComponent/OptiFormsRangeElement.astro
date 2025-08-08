@@ -1,10 +1,9 @@
 ---
-import type { 
-    DisplaySettingsFragment, OptiFormsRangeElement } from '../../../../__generated/sdk';
+import type {
+    DisplaySettingsFragment,
+    OptiFormsRangeElement,
+} from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
-
-// https://daisyui.com/components/range/
-
 
 export interface Props {
     data: OptiFormsRangeElement;
@@ -20,27 +19,37 @@ export interface Props {
 const { data, displaySettings } = Astro.props as Props;
 const { Label, Tooltip, PredefinedValue, Min, Max, Increment } = data;
 
-// Generate a unique ID for the input
-// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+// Ensure non-null numbers with defaults
+const safeMin: number = Min ?? 0;
+const safeMax: number = Max ?? 10;
+const safeIncrement: number = Increment ?? 1;
+
+// Generate dynamic range labels
+const rangeLabels = [];
+for (let i = safeMin; i <= safeMax; i += safeIncrement) {
+    rangeLabels.push(i);
+}
+
+const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 ---
 
 <fieldset class="fieldset w-full">
-  <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
-  <div class="w-full max-w-xs">
-    <input type="range" 
-      class="range w-full" 
-      min={Min} max={Max} 
-      value={PredefinedValue} 
-      step={Increment} 
-      title={Tooltip} />
-    <div class="flex justify-between px-2.5 mt-2 text-xs">
+    <legend class="fieldset-legend validator text-lg font-semibold"
+        >{Label}</legend
+    >
+    <div class="w-full max-w-xs">
+        <input
+            id={inputId}
+            type="range"
+            class="range w-full"
+            min={Min}
+            max={Max}
+            value={PredefinedValue}
+            step={Increment}
+            title={Tooltip}
+        />
+        <div class="mt-2 flex justify-between px-2.5 text-xs">
+            {rangeLabels.map((label) => <span>{label}</span>)}
+        </div>
     </div>
-    <!-- <div class="flex justify-between px-2.5 mt-2 text-xs">
-      <span>1</span>
-      <span>2</span>
-      <span>3</span>
-      <span>4</span>
-      <span>5</span>
-    </div> -->
-  </div>
 </fieldset>

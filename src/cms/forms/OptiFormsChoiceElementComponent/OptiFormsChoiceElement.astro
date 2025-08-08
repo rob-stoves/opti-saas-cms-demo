@@ -1,28 +1,27 @@
 ---
-import type { 
-    DisplaySettingsFragment, OptiFormsChoiceElement } from '../../../../__generated/sdk';
+import type {
+    DisplaySettingsFragment,
+    OptiFormsChoiceElement,
+} from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import { requiredValidatorMsg } from '../formHelper';
 
 // https://daisyui.com/components/input/
 
-
 //// Example of Options JSON structure:
-  // "Options": [
-  //   {
-  //     "label": "Choice 1",
-  //     "value": "Choice 1",
-  //     "selected": false
-  //   },
-  //   {
-  //     "label": "Choice 2",
-  //     "value": "Choice 2",
-  //     "selected": false
-  //   }
-  // ],
-  // "AllowMultiSelect": true,
-
-
-
+// "Options": [
+//   {
+//     "label": "Choice 1",
+//     "value": "Choice 1",
+//     "selected": false
+//   },
+//   {
+//     "label": "Choice 2",
+//     "value": "Choice 2",
+//     "selected": false
+//   }
+// ],
+// "AllowMultiSelect": true,
 
 export interface Props {
     data: OptiFormsChoiceElement;
@@ -37,43 +36,63 @@ export interface Props {
 const { data, displaySettings } = Astro.props as Props;
 const { Label, Tooltip, Options, Validators, AllowMultiSelect } = data;
 
-// Generate a unique ID for the input
-// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+const isRequiredErrorMsg = requiredValidatorMsg(Validators);
+
+const inputId = `choice-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 ---
 
-{AllowMultiSelect && 
-    <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
-      <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
-      <label class="label">
-        <input type="checkbox" class="checkbox" />
-        Option 1
-      </label>
-      <label class="label">
-        <input type="checkbox" class="checkbox" />
-        Option 2
-      </label>
-      <label class="label">
-        <input type="checkbox" class="checkbox" />
-        Option 3
-      </label>
-    </fieldset>
+{
+    AllowMultiSelect && (
+        <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
+            <legend class="fieldset-legend text-lg font-semibold">
+                {Label}
+            </legend>
+            {(Array.isArray(Options) ? Options : []).map(
+                (
+                    opt: { label: string; value: string; selected?: boolean },
+                    idx: number
+                ) => (
+                    <label class="label" for={opt.value}>
+                        <input
+                            id={opt.value}
+                            type="checkbox"
+                            class="checkbox"
+                            value={opt.value}
+                            checked={opt.selected}
+                        />
+                        {opt.label}
+                    </label>
+                )
+            )}
+        </fieldset>
+    )
 }
 
 <!-- Change to https://daisyui.com/components/filter/ ? -->
-{!AllowMultiSelect &&
-  <fieldset class="fieldset bg-base-100 border-base-300 w-full border p-4">
-    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
-    <label class="label">
-      <input type="radio" name="radio-1" class="radio" checked="checked" />
-      Option 1
-    </label>
-    <label class="label">
-      <input type="radio" name="radio-1" class="radio" />
-      Option 2
-    </label>
-    <label class="label">
-      <input type="radio" name="radio-1" class="radio" />
-      Option 3
-    </label>
-  </fieldset>
+{
+    !AllowMultiSelect && (
+        <fieldset class="fieldset bg-base-100 border-base-300 w-full border p-4">
+            <legend class="fieldset-legend text-lg font-semibold">
+                {Label}
+            </legend>
+            {(Array.isArray(Options) ? Options : []).map(
+                (
+                    opt: { label: string; value: string; selected?: boolean },
+                    idx: number
+                ) => (
+                    <label class="label" for={opt.value}>
+                        <input
+                            id={opt.value}
+                            type="radio"
+                            name={inputId}
+                            class="radio"
+                            value={opt.value}
+                            checked={opt.selected}
+                        />
+                        {opt.label}
+                    </label>
+                )
+            )}
+        </fieldset>
+    )
 }
