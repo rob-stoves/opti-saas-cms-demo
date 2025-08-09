@@ -48,6 +48,7 @@ const inputId = `selection-${Label?.replace(/\s+/g, '-')}-${Math.random().toStri
     <select
         class="select w-full"
         id={inputId}
+        name={inputId}
         autocomplete={AutoComplete || 'off'}
         multiple={AllowMultiSelect}
     >

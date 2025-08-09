@@ -37,6 +37,7 @@ const inputId = `number-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(
 <label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
 <input
     id={inputId}
+    name={inputId}
     type="number"
     class="input w-full"
     required={isRequiredErrorMsg ? true : false}
@@ -45,3 +46,10 @@ const inputId = `number-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(
     autocomplete={AutoComplete || 'off'}
     title={Tooltip}
 />
+{
+    isRequiredErrorMsg && (
+        <span id="error-msg" class="mt-1 text-sm text-red-600">
+            {isRequiredErrorMsg}
+        </span>
+    )
+}

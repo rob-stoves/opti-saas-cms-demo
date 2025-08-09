@@ -32,6 +32,8 @@ const optiResponse =
         ver: contentPayload.ver,
     }));
 
+const formId = contentPayload.key || grid.key || 'opti-form';
+
 const formGrid = optiResponse
     ? 'composition' in (optiResponse?._Component?.item ?? {})
         ? (optiResponse?._Component?.item as { composition?: any }).composition
@@ -66,12 +68,47 @@ const styles = [...nodeStyles, ...globalStyles];
 const formTitle = formGrid.component?.Title || formGrid.Title || null;
 const formDescription =
     formGrid.component?.Description || formGrid.Description || null;
+const formSubmitConfirmationMsg =
+    formGrid.component?.SubmitConfirmationMessage ||
+    formGrid.SubmitConfirmationMessage ||
+    null;
+const formResetConfirmationMsg =
+    formGrid.component?.ResetConfirmationMessage ||
+    formGrid.ResetConfirmationMessage ||
+    null;
+const formSubmitUrl =
+    formGrid.component?.SubmitUrl?.default ||
+    formGrid.SubmitUrl?.default ||
+    null;
+const showSummaryMessage: boolean =
+    formGrid.component?.ShowSummaryMessageAfterSubmission ||
+    formGrid.ShowSummaryMessageAfterSubmission ||
+    false;
+
+export const prerender = false; // Not needed in 'server' mode
+if (Astro.request.method === 'POST') {
+    console.log('Form submitted:');
+    try {
+        const data = await Astro.request.formData();
+        console.log('Form data:', Object.fromEntries(data.entries()));
+        // Do something with the data
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        }
+    }
+}
 ---
 
 {
     (nodeType === 'section' || !nodeType) && (
         <div class="vb:section flex flex-col" data-epi-block-id={formGrid.key}>
-            <form class="mx-auto mb-4 w-full rounded bg-white px-8 pt-6 pb-8 shadow-md">
+            <form
+                id={formId}
+                method="POST"
+                action={formSubmitUrl || '/'}
+                class="mx-auto mb-4 w-full rounded bg-white px-8 pt-6 pb-8 shadow-md"
+            >
                 {formTitle && (
                     <h2 class="mb-4 text-2xl font-bold">{formTitle}</h2>
                 )}
@@ -81,6 +118,29 @@ const formDescription =
                 ))}
             </form>
         </div>
+
+        // <script is:inline define:vars={{ formId }}>
+        //     document
+        //         .getElementById(formId)
+        //         .addEventListener('submit', async function (e) {
+        //             e.preventDefault(); // Prevent default form submission
+        //             const form = e.target;
+        //             console.log('Form submitted:', form);
+        //             const formData = new FormData(form);
+        //             console.log('Form data:', Object.fromEntries(formData.entries()));
+        //             const response = await fetch(form.action, {
+        //                 method: form.method,
+        //                 body: formData,
+        //             });
+
+        //             // Handle response as needed
+        //             if (response.ok) {
+        //                 console.log('Form submitted successfully!');
+        //             } else {
+        //                 console.error('Form submission failed.');
+        //             }
+        //         });
+        // </script>
     )
 }
 

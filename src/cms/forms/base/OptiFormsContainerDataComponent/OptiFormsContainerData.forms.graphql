@@ -5,9 +5,6 @@ fragment formContainerData on OptiFormsContainerData {
         type
         default
         hierarchical
-        internal
-        graph
-        base
     }
     Title
     Description
