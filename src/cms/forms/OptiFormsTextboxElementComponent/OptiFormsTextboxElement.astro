@@ -61,15 +61,44 @@ const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString
 <label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
 <input
     id={inputId}
+    name={inputId}
     type={inputType}
     class="input w-full"
     required={isRequiredErrorMsg ? true : false}
     placeholder={Placeholder}
     value={PredefinedValue}
     autocomplete={AutoComplete || 'off'}
-    pattern={regularExpressionValue || ''}
+    {...regularExpressionValue ? { pattern: regularExpressionValue } : {}}
     title={Tooltip}
 />
+{
+    isRequiredErrorMsg && (
+        <span id="error-msg" class="mt-1 text-sm text-red-600">
+            {isRequiredErrorMsg}
+        </span>
+    )
+}
+{
+    isRegExpErrorMsg && (
+        <span id="error-msg" class="mt-1 text-sm text-red-600">
+            {isRegExpErrorMsg}
+        </span>
+    )
+}
+{
+    isEmailErrorMsg && (
+        <span id="error-msg" class="mt-1 text-sm text-red-600">
+            {isEmailErrorMsg}
+        </span>
+    )
+}
+{
+    isNumberErrorMsg && (
+        <span id="error-msg" class="mt-1 text-sm text-red-600">
+            {isNumberErrorMsg}
+        </span>
+    )
+}
 <!-- <p class="label">Optional</p>  -->
 
 <!-- 

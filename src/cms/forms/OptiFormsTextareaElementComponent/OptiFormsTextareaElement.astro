@@ -51,6 +51,7 @@ const inputId = `textarea-${Label?.replace(/\s+/g, '-')}-${Math.random().toStrin
 <label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
 <textarea
     id={inputId}
+    name={inputId}
     class="textarea h-24 w-full"
     placeholder={Placeholder}
     required={isRequiredErrorMsg ? true : false}
