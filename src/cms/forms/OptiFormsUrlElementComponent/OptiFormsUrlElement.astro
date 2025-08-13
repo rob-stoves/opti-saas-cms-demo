@@ -34,19 +34,52 @@ const regularExpressionValue = isRegExpErrorMsg
     ? getRegularExpression(Validators)
     : undefined;
 
-const inputId = `url-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+// const inputId = `url-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '-') || `url-${Math.random().toString(36).substr(2, 4)}`;
+
+// Add error IDs and ARIA support
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`,
+    isRegExpErrorMsg && `${inputId}-regexp-error`
+].filter(Boolean).join(' ');
+
+// Add URL format description
+const urlDescriptionId = `${inputId}-description`;
+const describedByIds = [
+    errorIds,
+    urlDescriptionId
+].filter(Boolean).join(' ');
+
+// Default URL validation pattern
+const defaultUrlPattern = '^https?://[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(/.*)?$';
 ---
 
-<label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
+<label class="text-lg font-semibold" for={inputId}>
+    {Label}
+    {isRequiredErrorMsg && <span aria-label="required" class="text-red-500">*</span>}
+</label>
+
+<div id={urlDescriptionId} class="mb-1 text-sm text-gray-600">
+    Enter a valid URL (e.g., https://example.com)
+</div>
+
 <input
     id={inputId}
     name={inputId}
     type="url"
-    class="input w-full"
+    class="input validator w-full"
     required={isRequiredErrorMsg ? true : false}
-    placeholder={Placeholder}
+    aria-describedby={describedByIds}
+    placeholder={Placeholder || "https://example.com"}
     value={PredefinedValue}
-    pattern={regularExpressionValue ||
-        '^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$'}
-    title={Tooltip}
+    pattern={regularExpressionValue || defaultUrlPattern}
+    title={Tooltip || "Enter a valid URL starting with http:// or https://"}
+    autocomplete="url"
 />
+
+{isRequiredErrorMsg && (
+    <div class="validator-hint">{isRequiredErrorMsg}</div>
+)}
+{isRegExpErrorMsg && (
+    <div class="validator-hint">{isRegExpErrorMsg}</div>
+)}

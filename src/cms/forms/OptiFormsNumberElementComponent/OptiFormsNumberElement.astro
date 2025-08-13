@@ -30,26 +30,31 @@ const {
 } = data;
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
+// const inputId = `number-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '-') || `number-${Math.random().toString(36).substr(2, 4)}`;
 
-const inputId = `number-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+// Add error IDs and ARIA support
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`
+].filter(Boolean).join(' ');
 ---
 
-<label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
+<label class="text-lg font-semibold" for={inputId}>
+    {Label}
+    {isRequiredErrorMsg && <span aria-label="required" class="text-red-500">*</span>}
+</label>
 <input
     id={inputId}
     name={inputId}
     type="number"
-    class="input w-full"
+    class="input validator w-full"
     required={isRequiredErrorMsg ? true : false}
+    aria-describedby={errorIds || undefined}
     placeholder={Placeholder}
     value={PredefinedValue}
     autocomplete={AutoComplete || 'off'}
     title={Tooltip}
 />
-{
-    isRequiredErrorMsg && (
-        <span id="error-msg" class="mt-1 text-sm text-red-600">
-            {isRequiredErrorMsg}
-        </span>
-    )
-}
+{isRequiredErrorMsg && (
+    <div class="validator-hint">{isRequiredErrorMsg}</div>
+)}

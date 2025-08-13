@@ -39,28 +39,61 @@ const { Label, Tooltip, Options, Validators, AllowMultiSelect, AutoComplete } =
     data;
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
+const inputId = Label?.replace(/\s+/g, '-') || `selection-${Math.random().toString(36).substr(2, 4)}`;
 
-const inputId = `selection-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+// Generate error IDs for ARIA
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`
+].filter(Boolean).join(' ');
+
+// Add helpful description for multi-select
+const instructionText = AllowMultiSelect 
+    ? "Hold Ctrl (or Cmd on Mac) to select multiple options"
+    : "Select one option from the list";
+const instructionsId = `${inputId}-instructions`;
+
+const describedByIds = [
+    instructionsId,
+    errorIds
+].filter(Boolean).join(' ');
 ---
 
-<fieldset class="fieldset w-full">
-    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
+<fieldset class="fieldset w-full border border-gray-300 rounded p-4">
+    <legend class="fieldset-legend text-lg font-semibold px-2">
+        {Label}
+        {isRequiredErrorMsg && <span aria-label="required" class="text-red-500 ml-1">*</span>}
+    </legend>
+    
+    <div id={instructionsId} class="text-sm text-gray-600 mb-2">
+        {instructionText}
+    </div>
+    
     <select
-        class="select w-full"
+        class="select validator w-full"
         id={inputId}
-        name={inputId}
+        name={AllowMultiSelect ? `${inputId}[]` : inputId}
         autocomplete={AutoComplete || 'off'}
         multiple={AllowMultiSelect}
+        required={isRequiredErrorMsg ? true : false}
+        aria-describedby={describedByIds}
+        title={Tooltip}
+        size={AllowMultiSelect ? Math.min((Options?.length || 1) + 1, 8) : 1}
     >
-        <option disabled selected>{Tooltip}</option>
-        {
-            (Array.isArray(Options) ? Options : []).map(
-                (opt: { label: string; value: string; selected?: boolean }) => (
-                    <option value={opt.value} selected={opt.selected}>
-                        {opt.label}
-                    </option>
-                )
+        {!AllowMultiSelect && (
+            <option value="" disabled selected>
+                {Tooltip || "Choose an option..."}
+            </option>
+        )}
+        {(Array.isArray(Options) ? Options : []).map(
+            (opt: { label: string; value: string; selected?: boolean }) => (
+                <option value={opt.value} selected={opt.selected}>
+                    {opt.label}
+                </option>
             )
-        }
+        )}
     </select>
+    
+    {isRequiredErrorMsg && (
+        <div class="validator-hint">{isRequiredErrorMsg}</div>
+    )}
 </fieldset>

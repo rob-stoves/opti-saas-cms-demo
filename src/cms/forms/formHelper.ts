@@ -65,9 +65,9 @@ export function getRegularExpression(validators?: any): string | undefined {
               (item: Validator) => item.type === 'regularexpressionvalidator'
           )
         : undefined;
-
+        
     if (regExpValidator) {
-        return regExpValidator?.regularExpressionValue;
+        return regExpValidator?.regularExpression;
     }
     return undefined;
 }

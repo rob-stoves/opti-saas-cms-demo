@@ -40,21 +40,39 @@ const {
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
 const isRegExpErrorMsg = regExpValidatorMsg(Validators);
-
 const regularExpressionValue = getRegularExpression(Validators);
 
 // Generate a unique ID for the input
-const inputId = `textarea-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '-') || `textarea-${Math.random().toString(36).substr(2, 4)}`;
+
+// Generate error IDs for aria-describedby
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`,
+    isRegExpErrorMsg && `${inputId}-regexp-error`
+].filter(Boolean).join(' ');
 ---
 
 <!-- <h1>Textarea element!</h1> -->
-<label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
+<label class="text-lg font-semibold" for={inputId}>
+    {Label}
+    {isRequiredErrorMsg && <span aria-label="required" class="text-red-500">*</span>}
+</label>
 <textarea
     id={inputId}
     name={inputId}
-    class="textarea h-24 w-full"
+    class="textarea validator h-24 w-full"
     placeholder={Placeholder}
     required={isRequiredErrorMsg ? true : false}
+    aria-describedby={errorIds || undefined}
     value={PredefinedValue}
     autocomplete={AutoComplete || 'off'}
-    title={Tooltip}></textarea>
+    title={Tooltip}
+    {...regularExpressionValue ? { pattern: regularExpressionValue } : {}}
+></textarea>
+
+{isRequiredErrorMsg && (
+    <div class="validator-hint">{isRequiredErrorMsg}</div>
+)}
+{isRegExpErrorMsg && (
+    <div class="validator-hint">{isRegExpErrorMsg}</div>
+)}

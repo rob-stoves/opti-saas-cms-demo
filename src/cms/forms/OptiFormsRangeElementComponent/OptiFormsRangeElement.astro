@@ -23,18 +23,35 @@ const { Label, Tooltip, PredefinedValue, Min, Max, Increment } = data;
 const safeMin: number = Min ?? 0;
 const safeMax: number = Max ?? 10;
 const safeIncrement: number = Increment ?? 1;
+// const safePredefinedValue: number = PredefinedValue ?? safeMin; // Ensure predefined value is safe
+
+// // Generate dynamic range labels
+// const rangeLabels = [];
+// for (let i = safeMin; i <= safeMax; i += safeIncrement) {
+//     rangeLabels.push(i);
+// }
 
 // Generate dynamic range labels
 const rangeLabels = [];
-for (let i = safeMin; i <= safeMax; i += safeIncrement) {
-    rangeLabels.push(i);
+const totalSteps = Math.floor((safeMax - safeMin) / safeIncrement) + 1;
+
+if (totalSteps <= 10) {
+    // Show all labels if reasonable number
+    for (let i = safeMin; i <= safeMax; i += safeIncrement) {
+        rangeLabels.push(i);
+    }
+} else {
+    // Show only key points
+    rangeLabels.push(safeMin, safeMax);
 }
 
-const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+// const inputId = `range-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '-') || `range-${Math.random().toString(36).substr(2, 4)}`;
+const rangeDescriptionId = `range-description-${inputId}`;
 ---
 
 <fieldset class="fieldset w-full">
-    <legend class="fieldset-legend validator text-lg font-semibold"
+    <legend class="fieldset-legend text-lg font-semibold"
         >{Label}</legend
     >
     <div class="w-full max-w-xs">
@@ -42,15 +59,18 @@ const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString
             id={inputId}
             name={inputId}
             type="range"
-            class="range w-full"
-            min={Min}
-            max={Max}
+            class="range validator w-full"
+            min={safeMin}
+            max={safeMax}
             value={PredefinedValue}
-            step={Increment}
+            step={safeIncrement}
             title={Tooltip}
         />
         <div class="mt-2 flex justify-between px-2.5 text-xs">
             {rangeLabels.map((label) => <span>{label}</span>)}
         </div>
+    </div>
+    <div id={rangeDescriptionId} class="text-sm text-gray-600 mb-2">
+        Range from {safeMin} to {safeMax}, step by {safeIncrement}. Use arrow keys to adjust.
     </div>
 </fieldset>
