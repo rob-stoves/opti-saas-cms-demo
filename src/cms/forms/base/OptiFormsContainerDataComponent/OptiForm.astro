@@ -1,5 +1,6 @@
 ---
 import { Image as AstroImage } from 'astro:assets';
+import { actions } from 'astro:actions';
 import type { Locales } from 'astro';
 import { format } from 'date-fns';
 import { getOptimizelySdk } from '../../../../graphql/getSdk';
@@ -46,13 +47,6 @@ const formNodes = optiResponse
         : (optiResponse?._Component?.item as any)?.nodes
     : grid.nodes;
 
-// const formGrid = grid;
-// const formNodes = grid.nodes;
-
-// if (nodeType === 'column') { console.log('OptiForm column grid:', JSON.stringify(formGrid, null, 2)); }
-
-// console.log('Optiform formGrid:', JSON.stringify(formGrid, null, 2));
-// console.log('nodeType', nodeType);
 let nodeStyles: any[] = [];
 let globalStyles: any[] = [];
 
@@ -85,19 +79,6 @@ const showSummaryMessage: boolean =
     formGrid.ShowSummaryMessageAfterSubmission ||
     false;
 
-export const prerender = false; // Not needed in 'server' mode
-if (Astro.request.method === 'POST') {
-    console.log('Form submitted:');
-    try {
-        const data = await Astro.request.formData();
-        console.log('Form data:', Object.fromEntries(data.entries()));
-        // Do something with the data
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error(error.message);
-        }
-    }
-}
 ---
 
 {
@@ -105,10 +86,11 @@ if (Astro.request.method === 'POST') {
         <div class="vb:section flex flex-col" data-epi-block-id={formGrid.key}>
             <form
                 id={formId}
-                method="POST"
-                action={formSubmitUrl || '/'}
                 class="mx-auto mb-4 w-full rounded bg-white px-8 pt-6 pb-8 shadow-md"
             >
+                {formSubmitUrl && (
+                    <input type="hidden" name="formSubmitUrl" value={formSubmitUrl} />
+                )}
                 {formTitle && (
                     <h2 class="mb-4 text-2xl font-bold">{formTitle}</h2>
                 )}
@@ -119,28 +101,69 @@ if (Astro.request.method === 'POST') {
             </form>
         </div>
 
-        // <script is:inline define:vars={{ formId }}>
-        //     document
-        //         .getElementById(formId)
-        //         .addEventListener('submit', async function (e) {
-        //             e.preventDefault(); // Prevent default form submission
-        //             const form = e.target;
-        //             console.log('Form submitted:', form);
-        //             const formData = new FormData(form);
-        //             console.log('Form data:', Object.fromEntries(formData.entries()));
-        //             const response = await fetch(form.action, {
-        //                 method: form.method,
-        //                 body: formData,
-        //             });
+        <div data-form-id={formId} data-submit-message={formSubmitConfirmationMsg}></div>
+        <script>
+            import { actions } from "astro:actions";
+            import { isInputError } from "astro:actions";
 
-        //             // Handle response as needed
-        //             if (response.ok) {
-        //                 console.log('Form submitted successfully!');
-        //             } else {
-        //                 console.error('Form submission failed.');
-        //             }
-        //         });
-        // </script>
+            const element = document.querySelector('[data-form-id]') as HTMLElement;
+            const formId = element?.dataset.formId || 'opti-form';
+            const submitMessage = element?.dataset.submitMessage || "Form submitted, thank you.";
+
+            function clearPreviousMessage(id: string) {
+                const messageElement = document.getElementById(id);
+                if (messageElement) {
+                    messageElement.remove();
+                }
+            }
+
+            function addMessageElement(
+                message: string,
+                type: "error" | "success",
+                element: HTMLElement
+            ) {
+                const p = document.createElement("p");
+                p.id = "message";
+                p.className = `message ${type === "success" ? "text-teal-500" : "text-pink-500"} mt-2 px-2`;
+                p.innerText = message;
+                element.appendChild(p);
+            }
+
+            function clearInput(formElement: HTMLFormElement) {
+                formElement.reset();                
+            }
+
+            function renderMessage(error: any, data: any, form: HTMLElement) {
+                if (error && isInputError(error)) {
+                    const message = error.fields.email && error.fields.email[0];
+                    addMessageElement(message || "", "error", form);
+                } else {
+                    if (data?.formSubmitErrors) {
+                        const message = data?.formSubmitErrors.message;
+                        addMessageElement(message, "error", form);
+                    } else {
+                        const message = submitMessage || "Form submitted successfully.";
+                        clearInput(form as HTMLFormElement);
+                        addMessageElement(message, "success", form);
+                    }
+                }
+            }
+
+            const form = document.getElementById(formId) as HTMLFormElement;
+
+            async function handleFormSubmit(e: Event) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const { data, error } = await actions.submitForm(formData);
+                clearPreviousMessage("message");
+                renderMessage(error, data, form);
+            }
+
+            form.addEventListener("submit", handleFormSubmit);
+        </script>
+
+
     )
 }
 

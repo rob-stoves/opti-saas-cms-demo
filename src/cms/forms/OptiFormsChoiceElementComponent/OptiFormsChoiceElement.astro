@@ -37,62 +37,67 @@ const { data, displaySettings } = Astro.props as Props;
 const { Label, Tooltip, Options, Validators, AllowMultiSelect } = data;
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
-
 const inputId = `choice-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const legendId = `${inputId}-legend`;
+const instructionsId = `${inputId}-instructions`;
+
+// Generate error IDs for ARIA
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`
+].filter(Boolean).join(' ');
+
+const describedByIds = [
+    instructionsId,
+    errorIds
+].filter(Boolean).join(' ');
+
+// Determine input type and role based on AllowMultiSelect
+const inputType = AllowMultiSelect ? 'checkbox' : 'radio';
+const groupRole = AllowMultiSelect ? 'group' : 'radiogroup';
+const inputClass = AllowMultiSelect ? 'checkbox' : 'radio';
+const instructionText = AllowMultiSelect 
+    ? (isRequiredErrorMsg ? "Select at least one option" : "Select one or more options")
+    : "Select one option. Use arrow keys to navigate.";
 ---
 
-{
-    AllowMultiSelect && (
-        <fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
-            <legend class="fieldset-legend text-lg font-semibold">
-                {Label}
-            </legend>
-            {(Array.isArray(Options) ? Options : []).map(
-                (
-                    opt: { label: string; value: string; selected?: boolean },
-                    idx: number
-                ) => (
-                    <label class="label" for={opt.value}>
+<fieldset class="fieldset bg-base-100 border-base-300 rounded-box w-full border p-4">
+    <legend id={legendId} class="fieldset-legend text-lg font-semibold">
+        {Label}
+        {isRequiredErrorMsg && <span aria-label="required" class="text-red-500 ml-1">*</span>}
+    </legend>
+    
+    <div id={instructionsId} class="text-sm text-gray-600 mb-2">
+        {instructionText}
+    </div>
+    
+    <div 
+        role={groupRole}
+        aria-labelledby={legendId}
+        aria-describedby={describedByIds}
+        {...(!AllowMultiSelect && { 'aria-required': isRequiredErrorMsg ? "true" : "false" })}
+    >
+        {(Array.isArray(Options) ? Options : []).map(
+            (opt: { label: string; value: string; selected?: boolean }, idx: number) => {
+                const optionId = `${inputId}-${inputType}-${idx}`;
+                return (
+                    <label class="label cursor-pointer justify-start gap-3" for={optionId}>
                         <input
-                            id={opt.value}
-                            type="checkbox"
-                            class="checkbox"
+                            id={optionId}
+                            name={AllowMultiSelect ? `${inputId}[]` : inputId}
+                            type={inputType}
+                            class={inputClass}
                             value={opt.value}
                             checked={opt.selected}
+                            required={isRequiredErrorMsg ? (AllowMultiSelect ? false : true) : false}
                         />
-                        {opt.label}
+                        <span class="label-text">{opt.label}</span>
                     </label>
-                )
-            )}
-        </fieldset>
-    )
-}
-
-<!-- Change to https://daisyui.com/components/filter/ ? -->
-{
-    !AllowMultiSelect && (
-        <fieldset class="fieldset bg-base-100 border-base-300 w-full border p-4">
-            <legend class="fieldset-legend text-lg font-semibold">
-                {Label}
-            </legend>
-            {(Array.isArray(Options) ? Options : []).map(
-                (
-                    opt: { label: string; value: string; selected?: boolean },
-                    idx: number
-                ) => (
-                    <label class="label" for={opt.value}>
-                        <input
-                            id={opt.value}
-                            type="radio"
-                            name={inputId}
-                            class="radio"
-                            value={opt.value}
-                            checked={opt.selected}
-                        />
-                        {opt.label}
-                    </label>
-                )
-            )}
-        </fieldset>
-    )
-}
+                );
+            }
+        )}
+    </div>
+    
+    {isRequiredErrorMsg && (
+        <div class="validator-hint">{isRequiredErrorMsg}</div>
+    )}
+</fieldset>

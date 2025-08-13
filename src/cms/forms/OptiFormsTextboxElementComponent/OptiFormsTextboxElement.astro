@@ -55,16 +55,29 @@ const inputType =
 //         ? regularExpressionValue
 //         : '';
 
-const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+// const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '-') || `textbox-${Math.random().toString(36).substr(2, 4)}`;
+
+const errorIds = [
+    isRequiredErrorMsg && `${inputId}-required-error`,
+    isRegExpErrorMsg && `${inputId}-regexp-error`,
+    isEmailErrorMsg && `${inputId}-email-error`,
+    isNumberErrorMsg && `${inputId}-number-error`
+].filter(Boolean).join(' ');
 ---
 
-<label class="validator text-lg font-semibold" for={inputId}>{Label}</label>
+<label class="text-lg font-semibold" for={inputId}>
+    {Label}
+    {isRequiredErrorMsg && <span aria-label="required">*</span>}
+</label>
+
 <input
     id={inputId}
     name={inputId}
     type={inputType}
-    class="input w-full"
+    class="input validator w-full"
     required={isRequiredErrorMsg ? true : false}
+    aria-describedby={errorIds || undefined}
     placeholder={Placeholder}
     value={PredefinedValue}
     autocomplete={AutoComplete || 'off'}
@@ -73,46 +86,21 @@ const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString
 />
 {
     isRequiredErrorMsg && (
-        <span id="error-msg" class="mt-1 text-sm text-red-600">
-            {isRequiredErrorMsg}
-        </span>
+        <div class="validator-hint">{isRequiredErrorMsg}</div>
     )
 }
 {
     isRegExpErrorMsg && (
-        <span id="error-msg" class="mt-1 text-sm text-red-600">
-            {isRegExpErrorMsg}
-        </span>
+        <div class="validator-hint">{isRegExpErrorMsg}</div>
     )
 }
 {
     isEmailErrorMsg && (
-        <span id="error-msg" class="mt-1 text-sm text-red-600">
-            {isEmailErrorMsg}
-        </span>
+        <div class="validator-hint">{isEmailErrorMsg}</div>
     )
 }
 {
     isNumberErrorMsg && (
-        <span id="error-msg" class="mt-1 text-sm text-red-600">
-            {isNumberErrorMsg}
-        </span>
+        <div class="validator-hint">{isNumberErrorMsg}</div>
     )
 }
-<!-- <p class="label">Optional</p>  -->
-
-<!-- 
-<fieldset class="fieldset w-full">
-    <legend class="fieldset-legend text-lg font-semibold">{Label}</legend>
-    <input
-        type={inputType}
-        class="input w-full"
-        required={isRequiredErrorMsg ? true : false}
-        placeholder={Placeholder}
-        value={PredefinedValue}
-        autocomplete={AutoComplete || 'off'}
-        pattern={regularExpressionValue || ''}
-        title={Tooltip}
-    />
-    <p class="label">Optional</p>
-</fieldset> -->

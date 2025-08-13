@@ -1,4 +1,8 @@
 ---
+// TODO
+// Add form attribute for proper association + supporting multiple forms on page
+// form={FormId}
+
 import type {
     DisplaySettingsFragment,
     OptiFormsSubmitElement,
@@ -18,14 +22,25 @@ export interface Props {
 const { data, contentPayload, displaySettings } = Astro.props as Props;
 const { Label, Tooltip } = data;
 
+const defaultLabel = Label || "Submit Form";
+
 // Generate a unique ID for the input
-// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+const submitId = `submit-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <!-- 
 <LinkButton cssClasses="mt-4" tooltip={Tooltip} type="submit"
     >{Label}</LinkButton
 > -->
-<button class="btn btn-primary mt-4" type="submit" title={Tooltip}
-    >{Label}</button
+<button class="btn btn-primary mt-4" type="submit"
+    title={Tooltip || `Submit the form`}
+    aria-describedby={Tooltip ? `${submitId}-tooltip` : undefined}
 >
+    {defaultLabel}
+</button>
+
+{Tooltip && (
+    <div id={`${submitId}-tooltip`} class="sr-only">
+        {Tooltip}
+    </div>
+)}

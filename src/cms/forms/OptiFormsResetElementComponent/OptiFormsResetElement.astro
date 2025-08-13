@@ -3,7 +3,7 @@ import type {
     DisplaySettingsFragment, OptiFormsResetElement } from '../../../../__generated/sdk';
 import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
 
-import LinkButton from '../../components/ButtonComponent/LinkButton.astro';
+// import LinkButton from '../../components/ButtonComponent/LinkButton.astro';
 
 export interface Props {
     data: OptiFormsResetElement;
@@ -16,7 +16,15 @@ const { data, displaySettings } = Astro.props as Props;
 const { Label, Tooltip } = data;
 
 // Generate a unique ID for the input
-// const inputId = `textbox-${Math.random().toString(36).substr(2, 9)}`;
+const resetId = `reset-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
+const defaultLabel = Label || "Reset Form";
 ---
 
-<LinkButton tooltip={Tooltip}>{Label}</LinkButton>
+<button 
+    type="reset" 
+    id={resetId}
+    aria-describedby={Tooltip ? `${resetId}-tooltip` : undefined}
+    title={Tooltip || `Reset the form: ${defaultLabel}`}
+>
+    {defaultLabel}
+</button>
