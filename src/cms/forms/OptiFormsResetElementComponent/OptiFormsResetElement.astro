@@ -15,14 +15,14 @@ export interface Props {
 const { data, displaySettings } = Astro.props as Props;
 const { Label, Tooltip } = data;
 
-// Generate a unique ID for the input
-const resetId = `reset-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
+const resetId = Label?.replace(/\s+/g, '-') || `reset-${Math.random().toString(36).substr(2, 4)}`;
 const defaultLabel = Label || "Reset Form";
 ---
 
 <button 
-    type="reset" 
+    type="button" 
     id={resetId}
+    class="btn btn-secondary mt-4 form-reset-button"
     aria-describedby={Tooltip ? `${resetId}-tooltip` : undefined}
     title={Tooltip || `Reset the form: ${defaultLabel}`}
 >

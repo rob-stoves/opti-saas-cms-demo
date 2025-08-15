@@ -81,7 +81,8 @@ function buildDocumentArray() {
             '!./src/graphql/**/*.dam.graphql',
             '!./src/graphql/**/*.forms.graphql',
             './src/cms/**/*.graphql',
-            '!./src/cms/**/*.dam.graphql'
+            '!./src/cms/**/*.dam.graphql',
+            '!./src/cms/**/*.forms.graphql'
         ];
     }
 }

@@ -46,16 +46,7 @@ const regularExpressionValue = isRegExpErrorMsg
 
 const inputType =
     (isEmailErrorMsg && 'email') || (isNumberErrorMsg && 'number') || 'text';
-//  : isNumber ? 'number' : 'text';
-// const validatorHint = isEmail
-//     ? 'Enter valid email address'
-//     : isNumber
-//       ? 'Enter valid number'
-//       : isRegExp
-//         ? regularExpressionValue
-//         : '';
 
-// const inputId = `textbox-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 const inputId = Label?.replace(/\s+/g, '-') || `textbox-${Math.random().toString(36).substr(2, 4)}`;
 
 const errorIds = [
@@ -86,21 +77,21 @@ const errorIds = [
 />
 {
     isRequiredErrorMsg && (
-        <div class="validator-hint">{isRequiredErrorMsg}</div>
+        <div id={`${inputId}-required-error`} class="validator-hint hidden">{isRequiredErrorMsg}</div>
     )
 }
 {
     isRegExpErrorMsg && (
-        <div class="validator-hint">{isRegExpErrorMsg}</div>
+        <div id={`${inputId}-regexp-error`} class="validator-hint hidden">{isRegExpErrorMsg}</div>
     )
 }
 {
     isEmailErrorMsg && (
-        <div class="validator-hint">{isEmailErrorMsg}</div>
+        <div id={`${inputId}-email-error`} class="validator-hint hidden">{isEmailErrorMsg}</div>
     )
 }
 {
     isNumberErrorMsg && (
-        <div class="validator-hint">{isNumberErrorMsg}</div>
+        <div id={`${inputId}-number-error`} class="validator-hint hidden">{isNumberErrorMsg}</div>
     )
 }
