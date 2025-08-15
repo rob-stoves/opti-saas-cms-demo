@@ -77,9 +77,13 @@ const defaultUrlPattern = '^https?://[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\\.[
     autocomplete="url"
 />
 
-{isRequiredErrorMsg && (
-    <div class="validator-hint">{isRequiredErrorMsg}</div>
-)}
-{isRegExpErrorMsg && (
-    <div class="validator-hint">{isRegExpErrorMsg}</div>
-)}
+{
+    isRequiredErrorMsg && (
+        <div id={`${inputId}-required-error`} class="validator-hint hidden">{isRequiredErrorMsg}</div>
+    )
+}
+{
+    isRegExpErrorMsg && (
+        <div id={`${inputId}-regexp-error`} class="validator-hint hidden">{isRegExpErrorMsg}</div>
+    )
+}

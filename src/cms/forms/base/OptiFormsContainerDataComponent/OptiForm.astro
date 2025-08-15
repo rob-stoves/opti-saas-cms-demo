@@ -69,7 +69,7 @@ const formSubmitConfirmationMsg =
 const formResetConfirmationMsg =
     formGrid.component?.ResetConfirmationMessage ||
     formGrid.ResetConfirmationMessage ||
-    null;
+    "Are you sure you want to reset the form?";
 const formSubmitUrl =
     formGrid.component?.SubmitUrl?.default ||
     formGrid.SubmitUrl?.default ||
@@ -83,25 +83,46 @@ const showSummaryMessage: boolean =
 
 {
     (nodeType === 'section' || !nodeType) && (
-        <div class="vb:section flex flex-col" data-epi-block-id={formGrid.key}>
-            <form
-                id={formId}
-                class="mx-auto mb-4 w-full rounded bg-white px-8 pt-6 pb-8 shadow-md"
-            >
-                {formSubmitUrl && (
-                    <input type="hidden" name="formSubmitUrl" value={formSubmitUrl} />
-                )}
-                {formTitle && (
-                    <h2 class="mb-4 text-2xl font-bold">{formTitle}</h2>
-                )}
-                {formDescription && <p class="mb-4">{formDescription}</p>}
-                {formNodes?.map((step: any) => (
-                    <Astro.self contentPayload={contentPayload} grid={step} />
-                ))}
-            </form>
-        </div>
+        <>
+            <div class="vb:section flex flex-col" data-epi-block-id={formGrid.key}>
+                <form
+                    id={formId}
+                    class="mx-auto mb-4 w-full rounded bg-white px-8 pt-6 pb-8 shadow-md"
+                >
+                    {formSubmitUrl && (
+                        <input type="hidden" name="formSubmitUrl" value={formSubmitUrl} />
+                    )}
+                    {formTitle && (
+                        <h2 class="mb-4 text-2xl font-bold">{formTitle}</h2>
+                    )}
+                    {formDescription && <p class="mb-4">{formDescription}</p>}
+                    {formNodes?.map((step: any) => (
+                        <Astro.self contentPayload={contentPayload} grid={step} />
+                    ))}
+                </form>
+            </div>
 
-        <div data-form-id={formId} data-submit-message={formSubmitConfirmationMsg}></div>
+            <dialog id={`${formId}-reset-modal`} class="modal modal-middle">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg">Confirm Form Reset</h3>
+                    <p class="py-4">{formResetConfirmationMsg}</p>
+                    <div class="modal-action justify-center gap-8">
+                        <button class="btn btn-primary" id={`${formId}-reset-confirm-button`}>Confirm</button>
+                        <form method="dialog">
+                            <button class="btn btn-secondary">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+        </>
+
+        <div data-form-id={formId} 
+             data-submit-message={formSubmitConfirmationMsg}
+             data-reset-message={formResetConfirmationMsg}
+        ></div>
         <script>
             import { actions } from "astro:actions";
             import { isInputError } from "astro:actions";
@@ -109,6 +130,7 @@ const showSummaryMessage: boolean =
             const element = document.querySelector('[data-form-id]') as HTMLElement;
             const formId = element?.dataset.formId || 'opti-form';
             const submitMessage = element?.dataset.submitMessage || "Form submitted, thank you.";
+            const resetMessage = element?.dataset.resetMessage;
 
             function clearPreviousMessage(id: string) {
                 const messageElement = document.getElementById(id);
@@ -161,6 +183,27 @@ const showSummaryMessage: boolean =
             }
 
             form.addEventListener("submit", handleFormSubmit);
+
+            // Reset button confirmation logic
+            const resetButton = form.querySelector('.form-reset-button');
+            const resetModal = document.getElementById(`${formId}-reset-modal`) as HTMLDialogElement;
+            const confirmResetButton = document.getElementById(`${formId}-reset-confirm-button`);
+
+            if (resetButton && resetModal && confirmResetButton) {
+                // Open the modal when the form's reset button is clicked
+                resetButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    resetModal.showModal();
+                });
+
+                // Handle the actual reset on confirm
+                confirmResetButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearInput(form);
+                    clearPreviousMessage("message");
+                    resetModal.close();
+                });
+            }
         </script>
 
 

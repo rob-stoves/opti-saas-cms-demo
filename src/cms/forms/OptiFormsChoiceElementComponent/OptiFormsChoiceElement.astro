@@ -71,6 +71,7 @@ const instructionText = AllowMultiSelect
     </div>
     
     <div 
+        class="flex flex-row flex-wrap gap-x-6 gap-y-2"
         role={groupRole}
         aria-labelledby={legendId}
         aria-describedby={describedByIds}
@@ -83,7 +84,7 @@ const instructionText = AllowMultiSelect
                     <label class="label cursor-pointer justify-start gap-3" for={optionId}>
                         <input
                             id={optionId}
-                            name={AllowMultiSelect ? `${inputId}[]` : inputId}
+                            name={inputId}
                             type={inputType}
                             class={inputClass}
                             value={opt.value}
@@ -97,7 +98,9 @@ const instructionText = AllowMultiSelect
         )}
     </div>
     
-    {isRequiredErrorMsg && (
-        <div class="validator-hint">{isRequiredErrorMsg}</div>
-    )}
+    {
+        isRequiredErrorMsg && (
+            <div id={`${inputId}-required-error`} class="validator-hint hidden">{isRequiredErrorMsg}</div>
+        )
+    }
 </fieldset>
