@@ -1,8 +1,5 @@
 ---
-import { Image as AstroImage } from 'astro:assets';
-import { actions } from 'astro:actions';
 import type { Locales } from 'astro';
-import { format } from 'date-fns';
 import { getOptimizelySdk } from '../../../../graphql/getSdk';
 import type { ContentPayload } from '../../../../graphql/shared/ContentPayload';
 import { isEditContext } from '../../../shared/utils.ts';
@@ -35,49 +32,40 @@ const optiResponse =
 
 const formId = contentPayload.key || grid.key || 'opti-form';
 
-const formGrid = optiResponse
-    ? 'composition' in (optiResponse?._Component?.item ?? {})
-        ? (optiResponse?._Component?.item as { composition?: any }).composition
-        : optiResponse?._Component?.item
-    : grid;
-const formNodes = optiResponse
-    ? 'composition' in (optiResponse?._Component?.item ?? {})
-        ? (optiResponse?._Component?.item as { composition?: any }).composition
-              ?.nodes
-        : (optiResponse?._Component?.item as any)?.nodes
-    : grid.nodes;
+const formItem = optiResponse?.['_Component']?.item;
+const formComposition = formItem && 'composition' in formItem ? formItem.composition : formItem;
 
-let nodeStyles: any[] = [];
-let globalStyles: any[] = [];
+const formGrid = formComposition ?? grid;
+const formNodes = formComposition?.nodes ?? grid.nodes;
+
+let nodeStyles: string[] = [];
+let globalStyles: string[] = [];
 
 if (nodeType === 'row') {
-    nodeStyles = getRowStyles(formGrid);
-    globalStyles = getGlobalStyles(formGrid);
+	nodeStyles = getRowStyles(formGrid);
 } else if (nodeType === 'column') {
-    nodeStyles = getColumnStyles(formGrid);
-    globalStyles = getGlobalStyles(formGrid);
+	nodeStyles = getColumnStyles(formGrid);
 }
+
+if (nodeType === 'row' || nodeType === 'column') {
+	globalStyles = getGlobalStyles(formGrid);
+}
+
 const styles = [...nodeStyles, ...globalStyles];
 
-const formTitle = formGrid.component?.Title || formGrid.Title || null;
-const formDescription =
-    formGrid.component?.Description || formGrid.Description || null;
-const formSubmitConfirmationMsg =
-    formGrid.component?.SubmitConfirmationMessage ||
-    formGrid.SubmitConfirmationMessage ||
-    null;
-const formResetConfirmationMsg =
-    formGrid.component?.ResetConfirmationMessage ||
-    formGrid.ResetConfirmationMessage ||
-    "Are you sure you want to reset the form?";
-const formSubmitUrl =
-    formGrid.component?.SubmitUrl?.default ||
-    formGrid.SubmitUrl?.default ||
-    null;
-const showSummaryMessage: boolean =
-    formGrid.component?.ShowSummaryMessageAfterSubmission ||
-    formGrid.ShowSummaryMessageAfterSubmission ||
-    false;
+const getFormProperty = <T>(propName: string, defaultValue: T): T => {
+	return formGrid?.component?.[propName] ?? formGrid?.[propName] ?? defaultValue;
+};
+
+const formTitle: string = getFormProperty('Title', null);
+const formDescription: string | null = getFormProperty('Description', null);
+const formSubmitConfirmationMsg: string | null = getFormProperty('SubmitConfirmationMessage', null);
+const formResetConfirmationMsg: string = getFormProperty(
+	'ResetConfirmationMessage',
+	'Are you sure you want to reset the form?'
+);
+const formSubmitUrl: string | null = getFormProperty('SubmitUrl', null)?.default ?? null;
+const showSummaryMessage: boolean = getFormProperty('ShowSummaryMessageAfterSubmission', false);
 
 ---
 
@@ -130,7 +118,7 @@ const showSummaryMessage: boolean =
             const element = document.querySelector('[data-form-id]') as HTMLElement;
             const formId = element?.dataset.formId || 'opti-form';
             const submitMessage = element?.dataset.submitMessage || "Form submitted, thank you.";
-            const resetMessage = element?.dataset.resetMessage;
+            const resetMessage = element?.dataset.resetMessage || "Are you sure you want to reset the form?";
 
             function clearPreviousMessage(id: string) {
                 const messageElement = document.getElementById(id);
@@ -152,7 +140,7 @@ const showSummaryMessage: boolean =
             }
 
             function clearInput(formElement: HTMLFormElement) {
-                formElement.reset();                
+                formElement.reset();
             }
 
             function renderMessage(error: any, data: any, form: HTMLElement) {
@@ -164,7 +152,7 @@ const showSummaryMessage: boolean =
                         const message = data?.formSubmitErrors.message;
                         addMessageElement(message, "error", form);
                     } else {
-                        const message = submitMessage || "Form submitted successfully.";
+                        const message = submitMessage ?? "Form submitted successfully.";
                         clearInput(form as HTMLFormElement);
                         addMessageElement(message, "success", form);
                     }
