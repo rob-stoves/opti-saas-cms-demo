@@ -31,26 +31,30 @@ query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
                     ... on CompositionStructureNode {
                         key
                         nodeType
-                        rows: nodes {
+                        type
+                        nodes: nodes {
                             ... on CompositionStructureNode {
                                 key
                                 nodeType
+                                type
                                 displayTemplateKey
                                 displaySettings {
                                     ...DisplaySettings
                                 }
-                                columns: nodes {
+                                nodes: nodes {
                                     ... on CompositionStructureNode {
                                         key
                                         nodeType
+                                        type
                                         displayTemplateKey
                                         displaySettings {
                                             ...DisplaySettings
                                         }
-                                        nodes {
+                                        nodes: nodes {
                                             ... on CompositionComponentNode {
                                                 key
                                                 nodeType
+                                                type
                                                 displayTemplateKey
                                                 displaySettings {
                                                     ...DisplaySettings
@@ -60,6 +64,32 @@ query getExperience($key: [String]!, $ver: String, $loc: [Locales]) {
                                                         types
                                                     }
                                                     ...AllComponents
+                                                }
+                                            }
+                                            ... on CompositionStructureNode {
+                                                key
+                                                nodeType
+                                                type
+                                                displayTemplateKey
+                                                displaySettings {
+                                                    ...DisplaySettings
+                                                }
+                                                nodes: nodes {
+                                                    ... on CompositionComponentNode {
+                                                        key
+                                                        nodeType
+                                                        type
+                                                        displayTemplateKey
+                                                        displaySettings {
+                                                            ...DisplaySettings
+                                                        }
+                                                        component {
+                                                            _metadata {
+                                                                types
+                                                            }
+                                                            ...AllComponents
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
