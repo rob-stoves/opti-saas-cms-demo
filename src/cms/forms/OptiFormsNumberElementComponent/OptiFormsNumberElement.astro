@@ -30,7 +30,6 @@ const {
 } = data;
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
-// const inputId = `number-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 const inputId = Label?.replace(/\s+/g, '-') || `number-${Math.random().toString(36).substr(2, 4)}`;
 
 // Add error IDs and ARIA support

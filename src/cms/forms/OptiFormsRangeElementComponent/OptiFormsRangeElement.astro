@@ -45,7 +45,6 @@ if (totalSteps <= 10) {
     rangeLabels.push(safeMin, safeMax);
 }
 
-// const inputId = `range-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
 const inputId = Label?.replace(/\s+/g, '-') || `range-${Math.random().toString(36).substr(2, 4)}`;
 const rangeDescriptionId = `range-description-${inputId}`;
 ---
