@@ -39,7 +39,7 @@ const { Label, Tooltip, Options, Validators, AllowMultiSelect, AutoComplete } =
     data;
 
 const isRequiredErrorMsg = requiredValidatorMsg(Validators);
-const inputId = Label?.replace(/\s+/g, '-') || `selection-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '_') || `selection-${Math.random().toString(36).substr(2, 4)}`;
 
 // Generate error IDs for ARIA
 const errorIds = [

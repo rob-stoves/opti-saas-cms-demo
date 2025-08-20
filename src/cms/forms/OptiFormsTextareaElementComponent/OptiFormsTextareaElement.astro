@@ -43,7 +43,7 @@ const isRegExpErrorMsg = regExpValidatorMsg(Validators);
 const regularExpressionValue = getRegularExpression(Validators);
 
 // Generate a unique ID for the input
-const inputId = Label?.replace(/\s+/g, '-') || `textarea-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '_') || `textarea-${Math.random().toString(36).substr(2, 4)}`;
 
 // Generate error IDs for aria-describedby
 const errorIds = [

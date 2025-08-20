@@ -21,7 +21,7 @@ const { Label, Tooltip } = data;
 
 const defaultLabel = Label || "Submit Form";
 
-const submitId = Label?.replace(/\s+/g, '-') || `submit-${Math.random().toString(36).substr(2, 4)}`;
+const submitId = Label?.replace(/\s+/g, '_') || `submit-${Math.random().toString(36).substr(2, 4)}`;
 ---
 
 <button class="btn btn-primary mt-4" type="submit"

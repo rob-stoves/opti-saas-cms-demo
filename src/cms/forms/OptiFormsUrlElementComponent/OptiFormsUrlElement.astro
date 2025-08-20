@@ -35,7 +35,7 @@ const regularExpressionValue = isRegExpErrorMsg
     : undefined;
 
 // const inputId = `url-${Label?.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 4)}`;
-const inputId = Label?.replace(/\s+/g, '-') || `url-${Math.random().toString(36).substr(2, 4)}`;
+const inputId = Label?.replace(/\s+/g, '_') || `url-${Math.random().toString(36).substr(2, 4)}`;
 
 // Add error IDs and ARIA support
 const errorIds = [
