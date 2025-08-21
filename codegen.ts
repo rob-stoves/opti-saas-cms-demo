@@ -74,7 +74,6 @@ function buildDocumentArray() {
 
         return [...damFiles, ...formsFiles, ...finalFiles];
     } else {
-        console.log('both disabled');
         // When DAM and Forms are disabled, exclude all .dam.graphql and .forms.graphql files
         return [
             ...graphqlFilePath,
