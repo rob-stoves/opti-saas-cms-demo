@@ -4,9 +4,9 @@ import { z } from "astro:schema";
 const odpBaseUrl = import.meta.env.OPTIMIZELY_DATA_PLATFORM_ENDPOINT;
 const odpPrivateKey = import.meta.env.OPTIMIZELY_DATA_PLATFORM_PRIVATE_KEY;
 
-// Construct the ODP profile endpoint from the environment variable.
-const ODP_PROFILE_ENDPOINT = odpBaseUrl
-    ? `${odpBaseUrl.replace(/\/$/, "")}/v3/profiles`
+// Construct the ODP event endpoint from the environment variable.
+const ODP_EVENT_ENDPOINT = odpBaseUrl
+    ? `${odpBaseUrl.replace(/\/$/, "")}/v3/events`
     : "";
 
 const odpPublicKey = odpPrivateKey ? odpPrivateKey.split('.')[0] : null;
@@ -25,37 +25,58 @@ function formDataToObjectWithLowercaseKeys(formData: FormData): { [key: string]:
 }
 
 /**
- * Transforms FormData into the specific JSON structure required by the ODP API.
- * This converts form field names to lowercase and nests them inside an 'attributes' object.
+ * Transforms FormData into the specific event JSON structure required by the ODP Events API.
  * @param formData The FormData object from the form submission.
- * @returns An array containing an object with an 'attributes' property.
+ * @param vuid The VUID from the user's cookie.
+ * @returns A JSON object for the ODP event.
  */
-function transformFormDataForOdp(formData: FormData, vuid?: string | null): any[] {
-    const attributes = formDataToObjectWithLowercaseKeys(formData);
+function transformFormDataForOdpEvent(formData: FormData, vuid?: string | null): object {
+    const allFields = formDataToObjectWithLowercaseKeys(formData);
+    // Destructure known fields and gather the rest. 'formtitle' is expected from a hidden input.
+    const { formtitle, email, ...otherData } = allFields;
+
+    const identifiers: { vuid?: string; email?: FormDataEntryValue } = {};
     if (vuid) {
-        attributes['vuid'] = vuid;
+        identifiers.vuid = vuid;
     }
-    return [{ attributes }];
+    if (email) {
+        identifiers.email = email;
+    }
+
+    return {
+        type: "web_form",
+        action: "submission",
+        data: {
+            form_name: formtitle || "N/A", // Use formtitle from form, with a fallback.
+            campaign: "Form Submission: " + (formtitle || "N/A"),
+            ...otherData,
+            ...(email && { email }), // Also include email in the data payload if it exists
+        },
+        identifiers,
+    };
 }
 
 export async function submitFormData(method: string, submitUrl: string, body?: any) {
     const url = new URL(submitUrl);
     const headers: HeadersInit = {};
     let requestBody: BodyInit | null = null;
+    const isOdpEvent = ODP_EVENT_ENDPOINT && submitUrl === ODP_EVENT_ENDPOINT;
 
-    if (ODP_PROFILE_ENDPOINT && submitUrl === ODP_PROFILE_ENDPOINT && odpPublicKey) {
-        headers["x-api-key"] = odpPublicKey;
-    }
-
-    if (body) {
-        if (body instanceof FormData) {
-            // For FormData, let fetch set the Content-Type header automatically.
-            requestBody = body;
-        } else {
-            // For other body types, assume JSON.
-            headers["Content-Type"] = "application/json";
-            requestBody = JSON.stringify(body);
+    if (isOdpEvent) {
+        headers['Content-Type'] = 'application/json';
+        if (odpPublicKey) {
+            headers['x-api-key'] = odpPublicKey;
         }
+        // ODP Events API uses Basic Auth with the private key as the username.
+        if (odpPrivateKey) {
+            const basicAuth = Buffer.from(`${odpPrivateKey}:`).toString('base64');
+            headers['Authorization'] = `Basic ${basicAuth}`;
+        }
+        requestBody = JSON.stringify(body);
+    } else if (body) {
+        // Existing logic for non-ODP submissions
+        requestBody = body instanceof FormData ? body : JSON.stringify(body);
+        if (!(body instanceof FormData)) headers["Content-Type"] = "application/json";
     }
 
     try {
@@ -94,19 +115,19 @@ export const server = {
             const normalizedWebhookUrl = webhookUrl.replace(/\/$/, "");
             const normalizedOdpBaseUrl = odpBaseUrl ? odpBaseUrl.replace(/\/$/, "") : "";
 
-            const isOdpSubmission = (ODP_PROFILE_ENDPOINT && normalizedWebhookUrl === ODP_PROFILE_ENDPOINT) || (normalizedOdpBaseUrl && normalizedWebhookUrl === normalizedOdpBaseUrl);
+            const isOdpSubmission = (ODP_EVENT_ENDPOINT && normalizedWebhookUrl === ODP_EVENT_ENDPOINT) || (normalizedOdpBaseUrl && normalizedWebhookUrl === normalizedOdpBaseUrl);
 
             let payload;
             let finalSubmitUrl = webhookUrl;
 
             if (isOdpSubmission) {
-                if (!ODP_PROFILE_ENDPOINT) {
+                if (!ODP_EVENT_ENDPOINT) {
                     throw new Error("ODP submission intended, but ODP endpoint is not configured.");
                 }
-                finalSubmitUrl = ODP_PROFILE_ENDPOINT; // Always submit to the full profiles endpoint
+                finalSubmitUrl = ODP_EVENT_ENDPOINT; // Always submit to the full events endpoint
                 const vuidCookie = cookies.get('vuid')?.value;
                 const vuid = vuidCookie ? vuidCookie.split('|')[0] : null;
-                payload = transformFormDataForOdp(formSubmission, vuid);
+                payload = transformFormDataForOdpEvent(formSubmission, vuid);
             } else {
                 payload = formDataToObjectWithLowercaseKeys(formSubmission);
             }

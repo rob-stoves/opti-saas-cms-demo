@@ -11,6 +11,11 @@ import { getColumnStyles } from '../../../compositions/Column/ColumnHelper';
 
 const isCmsEdit = isEditContext(Astro.url);
 
+import { OPTIMIZELY_DATA_PLATFORM_PRIVATE_KEY } from 'astro:env/server';
+const odpPrivateKey = OPTIMIZELY_DATA_PLATFORM_PRIVATE_KEY;
+const odpTrackFormImpression = !!odpPrivateKey;
+
+
 export interface Props {
     grid: any;
     contentPayload: ContentPayload;
@@ -77,6 +82,7 @@ const showSummaryMessage: boolean = getFormProperty('ShowSummaryMessageAfterSubm
                     {formSubmitUrl && (
                         <input type="hidden" name="formSubmitUrl" value={formSubmitUrl} />
                     )}
+                    <input type="hidden" name="formTitle" value={formTitle} />
                     {formTitle && (
                         <h2 class="mb-4 text-2xl font-bold">{formTitle}</h2>
                     )}
@@ -191,6 +197,27 @@ const showSummaryMessage: boolean = getFormProperty('ShowSummaryMessageAfterSubm
             }
         </script>
 
+        <script is:inline define:vars={{ odpTrackFormImpression, formName: formTitle }}>
+            function trackFormImpression() {
+                if (odpTrackFormImpression && formName) {
+                    if (typeof zaius !== 'undefined') {
+                        zaius.event('web_form', {
+                            action: 'impression',
+                            form_name: formName,
+                            campaign: "Form Impression: " + formName
+                        });
+                    } else {
+                        console.warn("ODP script not available for form impression tracking.");
+                    }
+                }
+            }
+
+            // Run on initial page load
+            trackFormImpression();
+
+            // Run on subsequent client-side navigations for Astro View Transitions
+            document.addEventListener('astro:page-load', trackFormImpression);
+        </script>
 
     )
 }
