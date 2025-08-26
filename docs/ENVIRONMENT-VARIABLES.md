@@ -40,6 +40,10 @@ OPTIMIZELY_DEV_MODE=false
 # Delay for preview functionality (in milliseconds)
 # Default: 0
 PREVIEW_DELAY=1000
+
+# Enable/disable Optimizely Forms functionality
+# Default: false
+OPTIMIZELY_FORMS_ENABLED=false
 ```
 
 ### Preview & External Access
@@ -118,6 +122,16 @@ If you need external preview functionality:
   - Disable for performance on low-end devices
   - Disable for sites where transitions interfere with custom animations
 
+### OPTIMIZELY_FORMS_ENABLED
+- **Type**: Boolean
+- **Access**: Public (client-side)
+- **Default**: `false`
+- **Purpose**: Enable/disable Optimizely Forms functionality in the application
+- **Use Cases**:
+  - Enable to render and process Optimizely Forms components
+  - Disable to hide form functionality when not needed
+  - Control form feature availability per environment
+
 ### EXTERNAL_PREVIEW_ENABLED
 - **Type**: Boolean
 - **Access**: Public (server-side)
@@ -179,6 +193,7 @@ OPTIMIZELY_DEV_MODE=true
 ASTRO_TRANSITIONS_ENABLED=true
 EXTERNAL_PREVIEW_ENABLED=true
 PREVIEW_DELAY=500
+OPTIMIZELY_FORMS_ENABLED=true
 ```
 
 ### Production
@@ -187,6 +202,7 @@ OPTIMIZELY_DEV_MODE=false
 ASTRO_TRANSITIONS_ENABLED=true
 EXTERNAL_PREVIEW_ENABLED=false
 PREVIEW_DELAY=0
+OPTIMIZELY_FORMS_ENABLED=false
 ```
 
 ## 🔍 Testing Configuration
