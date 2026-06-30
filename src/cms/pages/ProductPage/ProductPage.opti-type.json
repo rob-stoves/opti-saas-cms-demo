@@ -1,0 +1,162 @@
+{
+	"key": "ProductPage",
+	"displayName": "Product",
+	"description": "Product detail page for a bathroom product (e.g. taps), with range, finish, price, description, image, and SEO/admin settings.",
+	"baseType": "_page",
+	"isContract": false,
+	"sortOrder": 0,
+	"mayContainTypes": [],
+	"mediaFileExtensions": [],
+	"compositionBehaviors": [],
+	"contracts": [],
+	"properties": {
+		"ProductImage": {
+			"type": "contentReference",
+			"displayName": "Product Image",
+			"description": "Main product image",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 10,
+			"allowedTypes": [
+				"_image"
+			],
+			"restrictedTypes": []
+		},
+		"Range": {
+			"type": "string",
+			"displayName": "Range",
+			"description": "Product range / collection name",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 20,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ProductType": {
+			"type": "string",
+			"displayName": "Product Type",
+			"description": "The type of product, e.g. Basin Mixer with Pop-up Waste",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 30,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ProductCode": {
+			"type": "string",
+			"displayName": "Product Code",
+			"description": "Manufacturer SKU / product code",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 40,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Category": {
+			"type": "string",
+			"format": "selectOne",
+			"displayName": "Category",
+			"description": "Product category",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 50,
+			"indexingType": "searchable",
+			"enum": [
+				{ "value": "Basin Tap", "displayName": "Basin Tap" },
+				{ "value": "Bath Tap/Filler", "displayName": "Bath Tap/Filler" },
+				{ "value": "Wall Mounted Tap", "displayName": "Wall Mounted Tap" },
+				{ "value": "Other", "displayName": "Other" }
+			],
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Finish": {
+			"type": "string",
+			"format": "selectOne",
+			"displayName": "Finish",
+			"description": "Product finish / colour",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 60,
+			"indexingType": "searchable",
+			"enum": [
+				{ "value": "Chrome", "displayName": "Chrome" },
+				{ "value": "Brushed Brass", "displayName": "Brushed Brass" },
+				{ "value": "Black", "displayName": "Black" },
+				{ "value": "Gun Metal Grey", "displayName": "Gun Metal Grey" }
+			],
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Price": {
+			"type": "float",
+			"displayName": "Price (RRP)",
+			"description": "Recommended retail price in GBP",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 70,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Description": {
+			"type": "string",
+			"displayName": "Description",
+			"description": "Product description",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 80,
+			"indexingType": "searchable",
+			"maxLength": 2000,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ProductUrl": {
+			"type": "url",
+			"displayName": "Product URL",
+			"description": "Link to the product on the manufacturer website",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 90,
+			"indexingType": "disabled",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"SeoSettings": {
+			"type": "component",
+			"contentType": "PageSeoSettings",
+			"displayName": "SEO Settings",
+			"description": "SEO metadata for the product page",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "SeoSettings",
+			"sortOrder": 100,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"PageAdminSettings": {
+			"type": "component",
+			"contentType": "PageAdminSettings",
+			"displayName": "Page Admin Settings",
+			"description": "Administrative settings for the product page",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "AdminSettings",
+			"sortOrder": 110,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		}
+	}
+}

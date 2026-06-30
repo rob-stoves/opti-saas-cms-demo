@@ -1,0 +1,169 @@
+---
+import { Image as AstroImage } from 'astro:assets';
+import type { Locales } from '../../../__generated/sdk';
+import { getOptimizelySdk } from '../../graphql/getSdk';
+import type { ContentPayload } from '../../graphql/shared/ContentPayload';
+import Layout from '../../layouts/Layout.astro';
+import { localeToSdkLocale } from '../../lib/locale-helpers';
+
+const lang = Astro.currentLocale || 'en';
+
+const contentPayload: ContentPayload = {
+    ctx: 'view',
+    key: '',
+    ver: '',
+    loc: localeToSdkLocale(lang) as string,
+    preview_token: '',
+    types: [],
+};
+
+const response = await getOptimizelySdk(contentPayload).getProducts({
+    //@ts-ignore
+    loc: contentPayload.loc as Locales,
+    limit: 400,
+});
+
+const items = response?.ProductPage?.items ?? [];
+const total = response?.ProductPage?.total ?? items.length;
+
+const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+
+const products = items.map((item: any) => {
+    const url =
+        ((item?._metadata?.url?.base || '') +
+            (item?._metadata?.url?.hierarchical || '')) ||
+        item?._metadata?.url?.default ||
+        '#';
+    return {
+        url,
+        title:
+            [item?.Range, item?.ProductType].filter(Boolean).join(' ') ||
+            item?._metadata?.displayName ||
+            'Product',
+        range: item?.Range || '',
+        productType: item?.ProductType || '',
+        category: item?.Category || '',
+        finish: item?.Finish || '',
+        price: item?.Price ?? null,
+        priceDisplay: item?.Price != null ? gbp.format(item.Price) : '',
+        image: item?.ProductImage?.url?.default || '/article-list-placeholder.jpg',
+    };
+});
+
+const countBy = (key: 'category' | 'finish') => {
+    const map = new Map<string, number>();
+    for (const p of products) {
+        const v = p[key];
+        if (!v) continue;
+        map.set(v, (map.get(v) || 0) + 1);
+    }
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+};
+
+const categories = countBy('category');
+const finishes = countBy('finish');
+---
+
+<Layout
+    title="Products"
+    description="Browse our full range of bathroom taps and fittings."
+    graphtype="website"
+    indexing={true}
+    contentPayload={contentPayload}
+>
+    <div class="max-w-screen-2xl mx-auto px-4 2xl:px-0 py-10" x-data={`{
+        category: '',
+        finish: '',
+        get visibleCount() {
+            return Array.from(document.querySelectorAll('[data-product]')).filter(el => el.style.display !== 'none').length;
+        }
+    }`}>
+        <header class="mb-8">
+            <h1 class="text-4xl font-semibold">Products</h1>
+            <p class="opacity-70 mt-2">{total} products</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[16rem_1fr] gap-10">
+            <!-- Filters -->
+            <aside class="space-y-6">
+                <div>
+                    <h2 class="font-semibold mb-2">Category</h2>
+                    <ul class="space-y-1">
+                        <li>
+                            <button class="link link-hover" :class="category === '' && 'font-bold'" @click="category = ''">
+                                All categories
+                            </button>
+                        </li>
+                        {categories.map(([name, count]) => (
+                            <li>
+                                <button
+                                    class="link link-hover"
+                                    :class={`category === '${name.replace(/'/g, "\\'")}' && 'font-bold'`}
+                                    @click={`category = '${name.replace(/'/g, "\\'")}'`}
+                                >
+                                    {name} <span class="opacity-50">({count})</span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="font-semibold mb-2">Finish</h2>
+                    <ul class="space-y-1">
+                        <li>
+                            <button class="link link-hover" :class="finish === '' && 'font-bold'" @click="finish = ''">
+                                All finishes
+                            </button>
+                        </li>
+                        {finishes.map(([name, count]) => (
+                            <li>
+                                <button
+                                    class="link link-hover"
+                                    :class={`finish === '${name.replace(/'/g, "\\'")}' && 'font-bold'`}
+                                    @click={`finish = '${name.replace(/'/g, "\\'")}'`}
+                                >
+                                    {name} <span class="opacity-50">({count})</span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Grid -->
+            <div
+                class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+                {products.map((p) => (
+                    <a
+                        href={p.url}
+                        data-product
+                        data-category={p.category}
+                        data-finish={p.finish}
+                        x-show={`(category === '' || category === '${p.category.replace(/'/g, "\\'")}') && (finish === '' || finish === '${p.finish.replace(/'/g, "\\'")}')`}
+                        class="card bg-base-100 shadow-sm hover:shadow-lg transition-shadow overflow-hidden"
+                    >
+                        <figure class="bg-base-200 aspect-square flex items-center justify-center p-4">
+                            <AstroImage
+                                src={p.image}
+                                alt={p.productType || p.title}
+                                class="max-h-full w-full object-contain"
+                                width={400}
+                                height={400}
+                                inferSize={p.image.startsWith('http') ? false : undefined}
+                            />
+                        </figure>
+                        <div class="card-body p-4">
+                            {p.range && <p class="text-xs uppercase tracking-wide opacity-60">{p.range}</p>}
+                            <h3 class="text-sm font-medium leading-snug">{p.productType || p.title}</h3>
+                            <div class="flex items-center justify-between mt-2">
+                                {p.priceDisplay && <span class="font-semibold">{p.priceDisplay}</span>}
+                                {p.finish && <span class="badge badge-outline badge-sm">{p.finish}</span>}
+                            </div>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </div>
+    </div>
+</Layout>

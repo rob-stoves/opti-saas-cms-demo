@@ -1,0 +1,148 @@
+---
+import { Image as AstroImage } from 'astro:assets';
+import type { Locales } from 'astro';
+import type { ProductPageFragment } from '../../../../__generated/sdk';
+import { getOptimizelySdk } from '../../../graphql/getSdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import Layout from '../../../layouts/Layout.astro';
+import { isEditContext } from '../../shared/utils.ts';
+
+const isCmsEdit = isEditContext(Astro.url);
+
+export interface Props {
+    contentPayload: ContentPayload;
+}
+const { contentPayload } = Astro.props as Props;
+
+const optiResponse = await getOptimizelySdk(contentPayload).pageById({
+    key: contentPayload.key,
+    //@ts-ignore
+    loc: contentPayload.loc as Locales,
+    ver: contentPayload.ver,
+});
+const product = optiResponse?._Page?.item as ProductPageFragment;
+
+const imageUrl = product?.ProductImage?.url?.default || '/article-list-placeholder.jpg';
+const title =
+    product?._metadata?.displayName ||
+    [product?.Range, product?.ProductType].filter(Boolean).join(' ') ||
+    'Product';
+
+const priceDisplay =
+    product?.Price != null
+        ? new Intl.NumberFormat('en-GB', {
+              style: 'currency',
+              currency: 'GBP',
+          }).format(product.Price)
+        : null;
+
+const graphType =
+    product?.SeoSettings?.GraphType && product?.SeoSettings?.GraphType !== '-'
+        ? product?.SeoSettings?.GraphType
+        : 'product';
+const defaultUrl = product?._metadata?.url?.default || '';
+const hierarchicalUrl =
+    product?._metadata?.url?.type === 'SIMPLE'
+        ? product?._metadata?.url?.hierarchical
+        : '';
+const extPreviewEnabled = product?.PageAdminSettings?.EnableExternalPreview ?? false;
+
+const specs = [
+    { label: 'Product code', value: product?.ProductCode },
+    { label: 'Range', value: product?.Range },
+    { label: 'Category', value: product?.Category },
+    { label: 'Finish', value: product?.Finish },
+].filter((s) => s.value);
+
+const pageClass = 'page-product';
+---
+
+<Layout
+    title={product?.SeoSettings?.MetaTitle ?? title}
+    description={product?.SeoSettings?.MetaDescription ?? product?.Description ?? ''}
+    graphtype={graphType}
+    indexing={product?.SeoSettings?.Indexing ?? false}
+    contentPayload={contentPayload}
+    defaultUrl={defaultUrl}
+    hierarchicalUrl={hierarchicalUrl ?? ''}
+    extPreviewEnabled={extPreviewEnabled}
+>
+    <div class={`max-w-screen-xl mx-auto px-4 2xl:px-0 ${pageClass}`}>
+        <nav class="text-sm breadcrumbs mt-6 mb-2 opacity-70">
+            <ul>
+                <li><a href="/products">Products</a></li>
+                {product?.Category && <li>{product.Category}</li>}
+            </ul>
+        </nav>
+
+        <main class="mt-4 mb-16 grid grid-cols-1 gap-10 md:grid-cols-2">
+            <div class="bg-base-200 rounded-2xl flex items-center justify-center p-6">
+                <AstroImage
+                    src={imageUrl}
+                    class="max-h-[32rem] w-full object-contain"
+                    alt={product?.ProductType || title}
+                    width={800}
+                    height={800}
+                    inferSize={imageUrl.startsWith('http') ? false : undefined}
+                    data-epi-edit={isCmsEdit ? 'ProductImage' : undefined}
+                />
+            </div>
+
+            <div class="flex flex-col">
+                {product?.Range && (
+                    <p class="text-sm uppercase tracking-wide opacity-60" data-epi-edit={isCmsEdit ? 'Range' : undefined}>
+                        {product.Range}
+                    </p>
+                )}
+                <h1 class="text-3xl lg:text-4xl font-semibold leading-tight mt-1" data-epi-edit={isCmsEdit ? 'ProductType' : undefined}>
+                    {product?.ProductType || title}
+                </h1>
+
+                <div class="flex flex-wrap gap-2 mt-3">
+                    {product?.Finish && <span class="badge badge-outline" data-epi-edit={isCmsEdit ? 'Finish' : undefined}>{product.Finish}</span>}
+                    {product?.Category && <span class="badge badge-ghost">{product.Category}</span>}
+                </div>
+
+                {priceDisplay && (
+                    <p class="text-3xl font-bold mt-6" data-epi-edit={isCmsEdit ? 'Price' : undefined}>
+                        {priceDisplay}
+                        <span class="text-sm font-normal opacity-60"> RRP</span>
+                    </p>
+                )}
+
+                {product?.Description && (
+                    <p class="mt-6 leading-relaxed opacity-90" data-epi-edit={isCmsEdit ? 'Description' : undefined}>
+                        {product.Description}
+                    </p>
+                )}
+
+                {specs.length > 0 && (
+                    <table class="table mt-8 max-w-md">
+                        <tbody>
+                            {specs.map((s) => (
+                                <tr>
+                                    <th class="font-medium opacity-70">{s.label}</th>
+                                    <td>{s.value}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+
+                {product?.ProductUrl && (
+                    <div class="mt-8">
+                        <a
+                            href={product.ProductUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-primary"
+                            data-epi-edit={isCmsEdit ? 'ProductUrl' : undefined}
+                        >
+                            View on manufacturer site
+                        </a>
+                    </div>
+                )}
+            </div>
+        </main>
+    </div>
+</Layout>

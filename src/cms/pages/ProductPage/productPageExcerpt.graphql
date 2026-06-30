@@ -1,0 +1,14 @@
+fragment ProductPageExcerpt on ProductPage {
+    _metadata {
+        ...PageUrl
+    }
+    ProductImage {
+        ...ContentUrl
+    }
+    Range
+    ProductType
+    ProductCode
+    Category
+    Finish
+    Price
+}

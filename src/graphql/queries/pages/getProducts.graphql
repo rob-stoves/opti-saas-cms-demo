@@ -1,0 +1,19 @@
+query getProducts(
+    $loc: [Locales]
+    $limit: Int! = 400
+    $skip: Int! = 0
+    $status: String! = "Published"
+) {
+    ProductPage(
+        locale: $loc
+        orderBy: { _metadata: { displayName: ASC } }
+        limit: $limit
+        skip: $skip
+        where: { _metadata: { status: { eq: $status } } }
+    ) {
+        total
+        items {
+            ...ProductPageExcerpt
+        }
+    }
+}

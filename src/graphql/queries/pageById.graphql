@@ -9,6 +9,7 @@ query pageById($key: [String], $loc: [Locales], $ver: String) {
             ...ArticlePage
             ...LandingPage
             ...MockupPage
+            ...ProductPage
         }
     }
 }

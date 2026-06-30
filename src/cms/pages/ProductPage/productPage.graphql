@@ -1,0 +1,24 @@
+fragment ProductPage on ProductPage {
+    _metadata {
+        ...PageUrl
+        published
+        displayName
+    }
+    ProductImage {
+        ...ContentUrl
+    }
+    Range
+    ProductType
+    ProductCode
+    Category
+    Finish
+    Price
+    Description
+    ProductUrl
+    SeoSettings {
+        ...PageSeoSettingsProperty
+    }
+    PageAdminSettings {
+        ...PageAdminSettingsProperty
+    }
+}
