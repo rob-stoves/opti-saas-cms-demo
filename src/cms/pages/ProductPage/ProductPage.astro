@@ -54,6 +54,12 @@ const specs = [
     { label: 'Finish', value: product?.Finish },
 ].filter((s) => s.value);
 
+// The manufacturer URL is derivable from the product code (Bristan URL pattern),
+// so we don't need to query the CMS ProductUrl property for it.
+const manufacturerUrl = product?.ProductCode
+    ? `https://www.bristan.com/products/bathroom-taps?code=${product.ProductCode.toLowerCase().replace(/ /g, '%20')}`
+    : null;
+
 const pageClass = 'page-product';
 ---
 
@@ -129,14 +135,13 @@ const pageClass = 'page-product';
                     </table>
                 )}
 
-                {product?.ProductUrl && (
+                {manufacturerUrl && (
                     <div class="mt-8">
                         <a
-                            href={product.ProductUrl}
+                            href={manufacturerUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             class="btn btn-primary"
-                            data-epi-edit={isCmsEdit ? 'ProductUrl' : undefined}
                         >
                             View on manufacturer site
                         </a>
