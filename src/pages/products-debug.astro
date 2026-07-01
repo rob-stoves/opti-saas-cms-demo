@@ -1,34 +1,26 @@
 ---
 import { OPTIMIZELY_GRAPH_GATEWAY, OPTIMIZELY_GRAPH_SINGLE_KEY } from 'astro:env/client';
+import { localeToSdkLocale } from '../lib/locale-helpers';
+
+const lang = Astro.currentLocale || 'en';
+const loc = localeToSdkLocale(lang);
+const site = Astro.url.origin;
 
 const query = `{
-  concrete: ProductPage(where: { _metadata: { status: { eq: "Published" } } }) { total }
-  viaType: _Page(where: { _metadata: { types: { eq: "ProductPage" }, status: { eq: "Published" } } }) { total }
-  base: _Page(where: { _metadata: { types: { notEq: "FolderPage" }, status: { eq: "Published" } } }) { total }
-  sample: _Page(
-    where: { _metadata: { types: { notEq: "FolderPage" }, status: { eq: "Published" } } }
-    orderBy: { _metadata: { displayName: ASC } }
-    limit: 5
-  ) {
-    items {
-      _metadata { displayName types url { base default } }
-      ... on ProductPage { ProductType Price Category }
-    }
-  }
+  full: _Page(locale: [${loc}], orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
+  noBase: _Page(locale: [${loc}], orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, types: { notEq: "FolderPage" } } }) { total }
+  noLocale: _Page(orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
+  noOrder: _Page(locale: [${loc}], where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
+  baseOnly: _Page(where: { _metadata: { url: { base: { eq: "${site}" } } } }) { total }
 }`;
 
-let out: any = null;
-let error: any = null;
+let out: any = null; let error: any = null;
 try {
   const res = await fetch(`${OPTIMIZELY_GRAPH_GATEWAY}/content/v2?auth=${OPTIMIZELY_GRAPH_SINGLE_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query }),
   });
   out = await res.json();
-} catch (e: any) {
-  error = String(e);
-}
-const payload = { gateway: OPTIMIZELY_GRAPH_GATEWAY, keyPresent: !!OPTIMIZELY_GRAPH_SINGLE_KEY, error, out };
+} catch (e: any) { error = String(e); }
+const payload = { lang, loc, site, error, out };
 ---
-<html><body><h1>products-debug</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
+<html><body><h1>products-debug v2</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
