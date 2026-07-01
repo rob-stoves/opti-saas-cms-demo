@@ -123,14 +123,15 @@
 			"restrictedTypes": []
 		},
 		"ProductUrl": {
-			"type": "url",
+			"type": "string",
 			"displayName": "Product URL",
 			"description": "Link to the product on the manufacturer website",
 			"isLocalized": false,
 			"isRequired": false,
 			"group": "Content",
 			"sortOrder": 90,
-			"indexingType": "disabled",
+			"indexingType": "searchable",
+			"maxLength": 1000,
 			"allowedTypes": [],
 			"restrictedTypes": []
 		},
