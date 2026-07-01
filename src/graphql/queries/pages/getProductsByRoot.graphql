@@ -4,13 +4,17 @@ query getProductsByRoot(
     $rootUrl: String
     $status: String! = "Published"
 ) {
-    ProductPage(
+    # See getProducts.graphql: query the base _Page collection filtered to the
+    # ProductPage type (reliably populated on the public Graph endpoint) and
+    # alias it back to `ProductPage` so the component code is unchanged.
+    ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
         limit: $limit
         where: {
             _metadata: {
                 status: { eq: $status }
+                types: { eq: "ProductPage" }
                 url: { default: { startsWith: $rootUrl } }
             }
         }

@@ -4,12 +4,21 @@ query getProducts(
     $skip: Int! = 0
     $status: String! = "Published"
 ) {
-    ProductPage(
+    # Query the base _Page collection filtered to the ProductPage type and alias
+    # it back to `ProductPage`. The type-specific `ProductPage(...)` collection is
+    # not reliably populated on the public Graph endpoint for this newly-created
+    # type, whereas the base `_Page` collection is (the sitemap uses the same path).
+    ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
         limit: $limit
         skip: $skip
-        where: { _metadata: { status: { eq: $status } } }
+        where: {
+            _metadata: {
+                status: { eq: $status }
+                types: { eq: "ProductPage" }
+            }
+        }
     ) {
         total
         items {
