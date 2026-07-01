@@ -1,4 +1,6 @@
 ---
+import { getSdk } from '../../__generated/sdk';
+import { print } from 'graphql';
 import { OPTIMIZELY_GRAPH_GATEWAY, OPTIMIZELY_GRAPH_SINGLE_KEY } from 'astro:env/client';
 import { localeToSdkLocale } from '../lib/locale-helpers';
 
@@ -6,28 +8,28 @@ const lang = Astro.currentLocale || 'en';
 const loc = localeToSdkLocale(lang);
 const site = Astro.url.origin;
 
-const query = `query gp($loc: [Locales], $limit: Int! = 500, $status: String! = "Published", $site: String) {
-  ProductPage: _Page(locale: $loc, orderBy: { _metadata: { displayName: ASC } }, limit: $limit, where: { _metadata: { status: { eq: $status }, url: { base: { eq: $site } }, types: { notEq: "FolderPage" } } }) {
-    total
-    items { _metadata { url { default } } ... on ProductPage { ProductType Price } }
-  }
-}`;
-
-async function run(vars: any) {
+let cap: any = {};
+const requester = async (doc: any, vars: any) => {
+  const q = print(doc);
   const res = await fetch(`${OPTIMIZELY_GRAPH_GATEWAY}/content/v2?auth=${OPTIMIZELY_GRAPH_SINGLE_KEY}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, variables: vars }),
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: q, variables: vars }),
   });
-  return await res.json();
-}
-const asString = await run({ loc: loc, limit: 3, site });
-const asArray = await run({ loc: [loc], limit: 3, site });
-const noLocVar = await run({ limit: 3, site });
-const payload = {
-  loc, site,
-  asString_total: asString?.data?.ProductPage?.total ?? null, asString_err: asString?.errors ?? null,
-  asArray_total: asArray?.data?.ProductPage?.total ?? null, asArray_err: asArray?.errors ?? null,
-  noLocVar_total: noLocVar?.data?.ProductPage?.total ?? null,
-  asString_first: asString?.data?.ProductPage?.items?.[0] ?? null,
+  const json: any = await res.json();
+  cap = {
+    query: q,
+    variables: vars,
+    errors: json.errors ?? null,
+    dataKeys: json.data ? Object.keys(json.data) : null,
+    total: json?.data?.ProductPage?.total ?? null,
+    itemsLen: json?.data?.ProductPage?.items?.length ?? null,
+  };
+  return json.data;
 };
+
+const sdk: any = getSdk(requester as any);
+let sdkErr: any = null;
+try { await sdk.getProducts({ loc, limit: 400, site } as any); } catch (e: any) { sdkErr = String(e?.message || e); }
+const payload = { loc, site, sdkErr, cap };
 ---
-<html><body><h1>debug v4</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
+<html><body><h1>debug v5 (generated query)</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
