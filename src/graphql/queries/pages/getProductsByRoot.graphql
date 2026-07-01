@@ -1,14 +1,13 @@
 query getProductsByRoot(
     $loc: [Locales]
-    $limit: Int! = 200
+    $limit: Int! = 500
     $rootUrl: String
     $status: String! = "Published"
     $site: String
 ) {
-    # See getProducts.graphql. Query the base _Page collection filtered to the
-    # ProductPage type, the current site origin (url.base), and the chosen root
-    # (url.default startsWith). Aliased to `ProductPage` so component code is
-    # unchanged.
+    # See getProducts.graphql. Scope to the chosen root via url.default startsWith
+    # plus url.base; select ProductPage fields via the fragment. Non-products are
+    # dropped in the component.
     ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
@@ -16,8 +15,8 @@ query getProductsByRoot(
         where: {
             _metadata: {
                 status: { eq: $status }
-                types: { eq: "ProductPage" }
                 url: { base: { eq: $site }, default: { startsWith: $rootUrl } }
+                types: { notEq: "FolderPage" }
             }
         }
     ) {

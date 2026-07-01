@@ -24,8 +24,10 @@ const response = await getOptimizelySdk(contentPayload).getProducts({
     site: Astro.url.origin,
 });
 
-const items = response?.ProductPage?.items ?? [];
-const total = response?.ProductPage?.total ?? items.length;
+const allItems = response?.ProductPage?.items ?? [];
+// The query returns all non-folder pages; keep only ProductPage items.
+const items = allItems.filter((i: any) => i?.ProductType || i?.Category || i?.ProductCode);
+const total = items.length;
 
 const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 

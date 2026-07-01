@@ -32,7 +32,9 @@ const productsResponse = await getOptimizelySdk(contentPayload).getProductsByRoo
     rootUrl,
     site: Astro.url.origin,
 });
-const items = (productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[];
+const items = ((productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[])
+    // The query returns all non-folder pages; keep only ProductPage items.
+    .filter((i: any) => i?.ProductType || i?.Category || i?.ProductCode);
 
 const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 

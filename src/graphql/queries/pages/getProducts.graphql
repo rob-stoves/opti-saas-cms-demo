@@ -1,14 +1,15 @@
 query getProducts(
     $loc: [Locales]
-    $limit: Int! = 400
+    $limit: Int! = 500
     $skip: Int! = 0
     $status: String! = "Published"
     $site: String
 ) {
-    # Query the base _Page collection filtered to the ProductPage type and alias
-    # it back to `ProductPage`. Also filter by url.base = current site origin —
-    # this is how every working collection query in this repo (sitemap, faceted
-    # search, ArticleList) reaches content on the public Graph endpoint.
+    # The public Graph index does not match `types: { eq: "ProductPage" }` for
+    # this newly-created type, even though items resolve as ProductPage for field
+    # selection (pageById + inline fragments work). Query the base _Page
+    # collection the way the sitemap does (url.base + types notEq FolderPage),
+    # select ProductPage fields via the fragment, and drop non-products in code.
     ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
@@ -17,8 +18,8 @@ query getProducts(
         where: {
             _metadata: {
                 status: { eq: $status }
-                types: { eq: "ProductPage" }
                 url: { base: { eq: $site } }
+                types: { notEq: "FolderPage" }
             }
         }
     ) {
