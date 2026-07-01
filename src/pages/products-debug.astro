@@ -1,26 +1,27 @@
 ---
-import { OPTIMIZELY_GRAPH_GATEWAY, OPTIMIZELY_GRAPH_SINGLE_KEY } from 'astro:env/client';
+import { getOptimizelySdk } from '../graphql/getSdk';
 import { localeToSdkLocale } from '../lib/locale-helpers';
 
 const lang = Astro.currentLocale || 'en';
 const loc = localeToSdkLocale(lang);
 const site = Astro.url.origin;
+const cp = { ctx: 'view', key: '', ver: '', loc, preview_token: '', types: [] };
 
-const query = `{
-  full: _Page(locale: [${loc}], orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
-  noBase: _Page(locale: [${loc}], orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, types: { notEq: "FolderPage" } } }) { total }
-  noLocale: _Page(orderBy: { _metadata: { displayName: ASC } }, where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
-  noOrder: _Page(locale: [${loc}], where: { _metadata: { status: { eq: "Published" }, url: { base: { eq: "${site}" } }, types: { notEq: "FolderPage" } } }) { total }
-  baseOnly: _Page(where: { _metadata: { url: { base: { eq: "${site}" } } } }) { total }
-}`;
-
-let out: any = null; let error: any = null;
+let sdkErr: any = null;
+let total: any = null;
+let itemsLen: any = null;
+let firstItem: any = null;
+let firstItemKeys: any = null;
 try {
-  const res = await fetch(`${OPTIMIZELY_GRAPH_GATEWAY}/content/v2?auth=${OPTIMIZELY_GRAPH_SINGLE_KEY}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query }),
-  });
-  out = await res.json();
-} catch (e: any) { error = String(e); }
-const payload = { lang, loc, site, error, out };
+  const r: any = await getOptimizelySdk(cp as any).getProducts({ loc: loc as any, limit: 400, site } as any);
+  total = r?.ProductPage?.total ?? null;
+  const items = r?.ProductPage?.items ?? [];
+  itemsLen = items.length;
+  firstItem = items[0] ?? null;
+  firstItemKeys = firstItem ? Object.keys(firstItem) : null;
+} catch (e: any) {
+  sdkErr = String(e?.message || e);
+}
+const payload = { loc, site, sdkErr, total, itemsLen, firstItemKeys, firstItem };
 ---
-<html><body><h1>products-debug v2</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
+<html><body><h1>products-debug v3 (SDK call)</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
