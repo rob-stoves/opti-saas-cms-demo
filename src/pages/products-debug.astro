@@ -1,0 +1,34 @@
+---
+import { OPTIMIZELY_GRAPH_GATEWAY, OPTIMIZELY_GRAPH_SINGLE_KEY } from 'astro:env/client';
+
+const query = `{
+  concrete: ProductPage(where: { _metadata: { status: { eq: "Published" } } }) { total }
+  viaType: _Page(where: { _metadata: { types: { eq: "ProductPage" }, status: { eq: "Published" } } }) { total }
+  base: _Page(where: { _metadata: { types: { notEq: "FolderPage" }, status: { eq: "Published" } } }) { total }
+  sample: _Page(
+    where: { _metadata: { types: { notEq: "FolderPage" }, status: { eq: "Published" } } }
+    orderBy: { _metadata: { displayName: ASC } }
+    limit: 5
+  ) {
+    items {
+      _metadata { displayName types url { base default } }
+      ... on ProductPage { ProductType Price Category }
+    }
+  }
+}`;
+
+let out: any = null;
+let error: any = null;
+try {
+  const res = await fetch(`${OPTIMIZELY_GRAPH_GATEWAY}/content/v2?auth=${OPTIMIZELY_GRAPH_SINGLE_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  out = await res.json();
+} catch (e: any) {
+  error = String(e);
+}
+const payload = { gateway: OPTIMIZELY_GRAPH_GATEWAY, keyPresent: !!OPTIMIZELY_GRAPH_SINGLE_KEY, error, out };
+---
+<html><body><h1>products-debug</h1><pre>{JSON.stringify(payload, null, 2)}</pre></body></html>
