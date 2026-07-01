@@ -1,0 +1,10 @@
+fragment ProductList on ProductList {
+    Title
+    NumberOfProducts
+    ProductRoot {
+        url {
+            default
+            base
+        }
+    }
+}

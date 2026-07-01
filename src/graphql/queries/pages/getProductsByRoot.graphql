@@ -1,0 +1,23 @@
+query getProductsByRoot(
+    $loc: [Locales]
+    $limit: Int! = 200
+    $rootUrl: String
+    $status: String! = "Published"
+) {
+    ProductPage(
+        locale: $loc
+        orderBy: { _metadata: { displayName: ASC } }
+        limit: $limit
+        where: {
+            _metadata: {
+                status: { eq: $status }
+                url: { default: { startsWith: $rootUrl } }
+            }
+        }
+    ) {
+        total
+        items {
+            ...ProductPageExcerpt
+        }
+    }
+}

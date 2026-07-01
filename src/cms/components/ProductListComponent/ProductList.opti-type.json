@@ -1,0 +1,53 @@
+{
+	"key": "ProductList",
+	"displayName": "Product List",
+	"description": "Lists products from a chosen Product Root with interactive filters to select by product type.",
+	"baseType": "_component",
+	"isContract": false,
+	"sortOrder": 0,
+	"mayContainTypes": [],
+	"mediaFileExtensions": [],
+	"compositionBehaviors": [
+		"sectionEnabled",
+		"elementEnabled"
+	],
+	"contracts": [],
+	"properties": {
+		"Title": {
+			"type": "string",
+			"displayName": "Title",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 0,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"NumberOfProducts": {
+			"type": "integer",
+			"displayName": "Maximum Number of Products to Show",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 100,
+			"minimum": 1,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ProductRoot": {
+			"type": "contentReference",
+			"displayName": "Product Root",
+			"description": "Section of the site to pull listed products from. Drag the Products page here.",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 200,
+			"allowedTypes": [
+				"_page"
+			],
+			"restrictedTypes": []
+		}
+	}
+}

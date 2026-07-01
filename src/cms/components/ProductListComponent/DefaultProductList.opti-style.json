@@ -1,0 +1,71 @@
+{
+	"key": "DefaultProductList",
+	"displayName": "Product List Default",
+	"contentType": "ProductList",
+	"isDefault": true,
+	"settings": {
+		"maxWidth": {
+			"displayName": "Max Width",
+			"editor": "select",
+			"sortOrder": 10,
+			"choices": {
+				"none": { "displayName": "None (Full Width) (Default)", "sortOrder": 10 },
+				"tw_5xl": { "displayName": "max-w-5xl", "sortOrder": 20 },
+				"tw_6xl": { "displayName": "max-w-6xl", "sortOrder": 30 },
+				"tw_7xl": { "displayName": "max-w-7xl", "sortOrder": 40 }
+			}
+		},
+		"titleAlignment": {
+			"displayName": "Title Alignment",
+			"editor": "select",
+			"sortOrder": 20,
+			"choices": {
+				"left": { "displayName": "Start (Default)", "sortOrder": 10 },
+				"center": { "displayName": "Center", "sortOrder": 20 },
+				"right": { "displayName": "End", "sortOrder": 30 }
+			}
+		},
+		"gridColumns": {
+			"displayName": "Grid Columns (Desktop)",
+			"editor": "select",
+			"sortOrder": 30,
+			"choices": {
+				"col4": { "displayName": "4 Columns (Default)", "sortOrder": 10 },
+				"col2": { "displayName": "2 Columns", "sortOrder": 20 },
+				"col3": { "displayName": "3 Columns", "sortOrder": 30 },
+				"col5": { "displayName": "5 Columns", "sortOrder": 40 },
+				"col6": { "displayName": "6 Columns", "sortOrder": 50 }
+			}
+		},
+		"showFilters": {
+			"displayName": "Show Product Type Filters",
+			"editor": "select",
+			"sortOrder": 40,
+			"choices": {
+				"show": { "displayName": "Show (Default)", "sortOrder": 10 },
+				"hide": { "displayName": "Hide", "sortOrder": 20 }
+			}
+		},
+		"cardShadow": {
+			"displayName": "Card Shadow",
+			"editor": "select",
+			"sortOrder": 50,
+			"choices": {
+				"sm": { "displayName": "Small (Default)", "sortOrder": 10 },
+				"none": { "displayName": "None", "sortOrder": 20 },
+				"md": { "displayName": "Medium", "sortOrder": 30 },
+				"lg": { "displayName": "Large", "sortOrder": 40 }
+			}
+		},
+		"hoverEffect": {
+			"displayName": "Hover Effect",
+			"editor": "select",
+			"sortOrder": 60,
+			"choices": {
+				"zoom_subtle": { "displayName": "Zoom (Subtle) (Default)", "sortOrder": 10 },
+				"zoom": { "displayName": "Zoom", "sortOrder": 20 },
+				"none": { "displayName": "None", "sortOrder": 30 }
+			}
+		}
+	}
+}

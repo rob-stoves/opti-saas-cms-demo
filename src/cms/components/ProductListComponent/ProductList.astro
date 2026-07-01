@@ -1,0 +1,191 @@
+---
+import { Image as AstroImage } from 'astro:assets';
+import type {
+    ProductListFragment,
+    ProductPageExcerptFragment,
+    DisplaySettingsFragment,
+} from '../../../../__generated/sdk';
+import { getOptimizelySdk } from '../../../graphql/getSdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import { getDictionaryFromDisplaySettings } from '../../../graphql/shared/displaySettingsHelpers';
+import { isEditContext } from '../../shared/utils.ts';
+
+const isCmsEdit = isEditContext(Astro.url);
+
+export interface Props {
+    key: string;
+    data: ProductListFragment;
+    displaySettings: DisplaySettingsFragment[];
+    contentPayload: ContentPayload;
+}
+const { key, data, displaySettings, contentPayload } = Astro.props as Props;
+
+// Pull products from the chosen Product Root (falls back to the /products tree).
+const rootUrl = data.ProductRoot?.url?.default || '/products/';
+
+const productsResponse = await getOptimizelySdk(contentPayload).getProductsByRoot({
+    //@ts-ignore
+    loc: contentPayload.loc,
+    limit: data.NumberOfProducts || 200,
+    rootUrl,
+});
+const items = (productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[];
+
+const gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+
+// Distinct product types (for the filter dropdown) and categories (for filter chips).
+const productTypes = [
+    ...new Set(items.map((i) => i?.ProductType).filter(Boolean) as string[]),
+].sort((a, b) => a.localeCompare(b));
+const categories = [
+    ...new Set(items.map((i) => i?.Category).filter(Boolean) as string[]),
+].sort((a, b) => a.localeCompare(b));
+
+// Style settings
+const styleDictionary = getDictionaryFromDisplaySettings(displaySettings);
+const maxWidth = styleDictionary['maxWidth'] || 'none';
+const titleAlignment = styleDictionary['titleAlignment'] || 'left';
+const gridColumns = styleDictionary['gridColumns'] || 'col4';
+const showFilters = (styleDictionary['showFilters'] || 'show') === 'show';
+const cardShadow = styleDictionary['cardShadow'] || 'sm';
+const hoverEffect = styleDictionary['hoverEffect'] || 'zoom_subtle';
+
+const containerWrapperClasses = {
+    'max-w-5xl': maxWidth === 'tw_5xl',
+    'max-w-6xl': maxWidth === 'tw_6xl',
+    'max-w-7xl': maxWidth === 'tw_7xl',
+    'mx-auto': maxWidth !== 'none',
+};
+
+const titleClasses = {
+    'text-start': titleAlignment === 'left',
+    'text-center': titleAlignment === 'center',
+    'text-end': titleAlignment === 'right',
+};
+
+const gridContainerClasses = {
+    'grid gap-6 grid-cols-2': true,
+    'md:grid-cols-2': gridColumns === 'col2',
+    'md:grid-cols-3 xl:grid-cols-3': gridColumns === 'col3',
+    'md:grid-cols-3 xl:grid-cols-4': gridColumns === 'col4',
+    'md:grid-cols-3 xl:grid-cols-5': gridColumns === 'col5',
+    'md:grid-cols-3 xl:grid-cols-6': gridColumns === 'col6',
+};
+
+const cardDynamicClasses = {
+    'shadow-none': cardShadow === 'none',
+    'shadow-sm': cardShadow === 'sm',
+    'shadow-md': cardShadow === 'md',
+    'shadow-lg': cardShadow === 'lg',
+    'transition-transform duration-300 hover:scale-105': hoverEffect === 'zoom',
+    'transition-transform duration-300 hover:scale-[1.02]': hoverEffect === 'zoom_subtle',
+    'overflow-hidden': hoverEffect === 'zoom' || hoverEffect === 'zoom_subtle',
+};
+
+const esc = (s: string) => (s || '').replace(/'/g, "\\'");
+const componentClass = 'component-productlist';
+---
+
+<div
+    data-epi-block-id={(isCmsEdit && key) || undefined}
+    class={componentClass}
+    x-data="{ category: '', ptype: '' }"
+>
+    <div class="w-full" class:list={[containerWrapperClasses]}>
+        {data?.Title && (
+            <h2
+                class="w-full basis-full text-2xl font-semibold mb-4"
+                class:list={[titleClasses]}
+                data-epi-edit={isCmsEdit ? 'Title' : undefined}
+            >
+                {data.Title}
+            </h2>
+        )}
+
+        {showFilters && (productTypes.length > 0 || categories.length > 0) && (
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                {categories.length > 1 && (
+                    <div class="flex flex-wrap gap-2">
+                        <button
+                            class="btn btn-sm"
+                            :class="category === '' ? 'btn-primary' : 'btn-ghost'"
+                            @click="category = ''"
+                        >
+                            All
+                        </button>
+                        {categories.map((c) => (
+                            <button
+                                class="btn btn-sm"
+                                :class={`category === '${esc(c)}' ? 'btn-primary' : 'btn-ghost'`}
+                                @click={`category = (category === '${esc(c)}' ? '' : '${esc(c)}')`}
+                            >
+                                {c}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                {productTypes.length > 0 && (
+                    <select class="select select-bordered select-sm max-w-xs ms-auto" x-model="ptype">
+                        <option value="">All product types</option>
+                        {productTypes.map((t) => (
+                            <option value={t}>{t}</option>
+                        ))}
+                    </select>
+                )}
+            </div>
+        )}
+
+        <div class:list={[gridContainerClasses]}>
+            {items.map((item) => {
+                const url =
+                    ((item?._metadata?.url?.base || '') +
+                        (item?._metadata?.url?.hierarchical || '')) ||
+                    item?._metadata?.url?.default ||
+                    '#';
+                const img = item?.ProductImage?.url?.default || '/article-list-placeholder.jpg';
+                const cat = item?.Category || '';
+                const ptype = item?.ProductType || '';
+                return (
+                    <a
+                        href={url}
+                        data-product
+                        x-show={`(category === '' || category === '${esc(cat)}') && (ptype === '' || ptype === '${esc(ptype)}')`}
+                        class="card bg-base-100"
+                        class:list={[cardDynamicClasses]}
+                    >
+                        <figure class="bg-base-200 aspect-square flex items-center justify-center p-4">
+                            <AstroImage
+                                src={img}
+                                alt={ptype || item?.Range || 'Product'}
+                                class="max-h-full w-full object-contain"
+                                width={400}
+                                height={400}
+                                inferSize={img.startsWith('http') ? false : undefined}
+                            />
+                        </figure>
+                        <div class="card-body p-4">
+                            {item?.Range && (
+                                <p class="text-xs uppercase tracking-wide opacity-60">{item.Range}</p>
+                            )}
+                            <h3 class="text-sm font-medium leading-snug">{ptype || item?.Range}</h3>
+                            <div class="flex items-center justify-between mt-2">
+                                {item?.Price != null && (
+                                    <span class="font-semibold">{gbp.format(item.Price)}</span>
+                                )}
+                                {item?.Finish && (
+                                    <span class="badge badge-outline badge-sm">{item.Finish}</span>
+                                )}
+                            </div>
+                        </div>
+                    </a>
+                );
+            })}
+        </div>
+
+        {items.length === 0 && (
+            <p class="opacity-60">
+                No products found. Set the <strong>Product Root</strong> to the Products page.
+            </p>
+        )}
+    </div>
+</div>
