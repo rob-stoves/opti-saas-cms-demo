@@ -25,14 +25,28 @@ const { key, data, displaySettings, contentPayload } = Astro.props as Props;
 // all products out of the box instead of nothing.
 const rootUrl = data.ProductRoot?.url?.default || '/';
 
-const productsResponse = await getOptimizelySdk(contentPayload).getProductsByRoot({
-    //@ts-ignore
-    loc: contentPayload.loc,
-    limit: data.NumberOfProducts || 200,
-    rootUrl,
-    site: Astro.url.origin,
-});
-const items = ((productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[])
+// Optimizely Graph caps `limit` at 100, so page through results with `skip`
+// up to the editor-configured maximum (defaults to enough for the full range).
+const maxProducts = data.NumberOfProducts || 400;
+const sdk = getOptimizelySdk(contentPayload);
+const PAGE_SIZE = 100;
+const rawItems: ProductPageExcerptFragment[] = [];
+let graphTotal = 0;
+for (let i = 0; i < 25 && rawItems.length < maxProducts; i++) {
+    const productsResponse = await sdk.getProductsByRoot({
+        //@ts-ignore
+        loc: contentPayload.loc,
+        limit: Math.min(PAGE_SIZE, maxProducts - rawItems.length),
+        skip: i * PAGE_SIZE,
+        rootUrl,
+        site: Astro.url.origin,
+    });
+    const pageItems = (productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[];
+    graphTotal = productsResponse?.ProductPage?.total ?? graphTotal;
+    rawItems.push(...pageItems);
+    if (pageItems.length < PAGE_SIZE || rawItems.length >= graphTotal) break;
+}
+const items = rawItems
     // The query returns all non-folder pages; keep only ProductPage items.
     .filter((i: any) => i?.ProductType || i?.Category || i?.ProductCode);
 

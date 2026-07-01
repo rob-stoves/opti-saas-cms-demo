@@ -1,15 +1,13 @@
 query getProducts(
     $loc: [Locales]
-    $limit: Int! = 500
+    $limit: Int! = 100
     $skip: Int! = 0
     $status: String! = "Published"
     $site: String
 ) {
-    # The public Graph index does not match `types: { eq: "ProductPage" }` for
-    # this newly-created type, even though items resolve as ProductPage for field
-    # selection (pageById + inline fragments work). Query the base _Page
-    # collection the way the sitemap does (url.base + types notEq FolderPage),
-    # select ProductPage fields via the fragment, and drop non-products in code.
+    # Optimizely Graph caps `limit` at 100 — callers paginate with `skip`.
+    # Query _Page filtered to products (the ProductPage collection isn't reliably
+    # populated for this new type) and alias to `ProductPage`.
     ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }

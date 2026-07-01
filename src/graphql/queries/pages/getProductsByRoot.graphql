@@ -1,17 +1,17 @@
 query getProductsByRoot(
     $loc: [Locales]
-    $limit: Int! = 500
+    $limit: Int! = 100
+    $skip: Int! = 0
     $rootUrl: String
     $status: String! = "Published"
     $site: String
 ) {
-    # See getProducts.graphql. Scope to the chosen root via url.default startsWith
-    # plus url.base; select ProductPage fields via the fragment. Non-products are
-    # dropped in the component.
+    # Optimizely Graph caps `limit` at 100 — callers paginate with `skip`.
     ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
         limit: $limit
+        skip: $skip
         where: {
             _metadata: {
                 status: { eq: $status }
