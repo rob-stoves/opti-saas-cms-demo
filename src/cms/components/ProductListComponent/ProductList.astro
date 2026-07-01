@@ -20,8 +20,10 @@ export interface Props {
 }
 const { key, data, displaySettings, contentPayload } = Astro.props as Props;
 
-// Pull products from the chosen Product Root (falls back to the /products tree).
-const rootUrl = data.ProductRoot?.url?.default || '/products/';
+// Pull products from the chosen Product Root. When no root is set, fall back
+// to '/' — every published ProductPage URL starts with '/', so the block shows
+// all products out of the box instead of nothing.
+const rootUrl = data.ProductRoot?.url?.default || '/';
 
 const productsResponse = await getOptimizelySdk(contentPayload).getProductsByRoot({
     //@ts-ignore
