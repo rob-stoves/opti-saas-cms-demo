@@ -30,6 +30,7 @@ const productsResponse = await getOptimizelySdk(contentPayload).getProductsByRoo
     loc: contentPayload.loc,
     limit: data.NumberOfProducts || 200,
     rootUrl,
+    site: Astro.url.origin,
 });
 const items = (productsResponse?.ProductPage?.items || []) as ProductPageExcerptFragment[];
 

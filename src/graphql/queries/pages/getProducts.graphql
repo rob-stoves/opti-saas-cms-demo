@@ -3,11 +3,12 @@ query getProducts(
     $limit: Int! = 400
     $skip: Int! = 0
     $status: String! = "Published"
+    $site: String
 ) {
     # Query the base _Page collection filtered to the ProductPage type and alias
-    # it back to `ProductPage`. The type-specific `ProductPage(...)` collection is
-    # not reliably populated on the public Graph endpoint for this newly-created
-    # type, whereas the base `_Page` collection is (the sitemap uses the same path).
+    # it back to `ProductPage`. Also filter by url.base = current site origin —
+    # this is how every working collection query in this repo (sitemap, faceted
+    # search, ArticleList) reaches content on the public Graph endpoint.
     ProductPage: _Page(
         locale: $loc
         orderBy: { _metadata: { displayName: ASC } }
@@ -17,6 +18,7 @@ query getProducts(
             _metadata: {
                 status: { eq: $status }
                 types: { eq: "ProductPage" }
+                url: { base: { eq: $site } }
             }
         }
     ) {

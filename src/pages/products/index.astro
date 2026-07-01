@@ -21,6 +21,7 @@ const response = await getOptimizelySdk(contentPayload).getProducts({
     //@ts-ignore
     loc: contentPayload.loc as Locales,
     limit: 400,
+    site: Astro.url.origin,
 });
 
 const items = response?.ProductPage?.items ?? [];
