@@ -1,0 +1,372 @@
+---
+import type { Locales } from 'astro';
+import type { CourseListFragment } from '../../../../__generated/sdk';
+import {
+    OPTIMIZELY_GRAPH_GATEWAY,
+    OPTIMIZELY_GRAPH_SINGLE_KEY,
+} from 'astro:env/client';
+import { getOptimizelySdk } from '../../../graphql/getSdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+
+export interface Props {
+    contentPayload: ContentPayload;
+    data: CourseListFragment;
+}
+
+const { contentPayload, data } = Astro.props as Props;
+
+const limit = data?.DefaultLimit ?? 12;
+const defaultStudyLevel = data?.DefaultStudyLevel ?? null;
+
+const sdk = getOptimizelySdk(contentPayload);
+const initialStudyLevel = defaultStudyLevel ? [defaultStudyLevel] : undefined;
+const initialData = await sdk.CourseSearch({
+    studyLevel: initialStudyLevel,
+    limit,
+    //@ts-ignore
+    locale: contentPayload.loc as Locales,
+});
+
+const initialCourses = initialData?.CoursePage?.items ?? [];
+const initialTotal = initialData?.CoursePage?.total ?? 0;
+const initialCursor = initialData?.CoursePage?.cursor ?? null;
+const initialFacets = initialData?.CoursePage?.facets ?? {};
+
+const graphEndpoint = `${OPTIMIZELY_GRAPH_GATEWAY}/content/v2?auth=${OPTIMIZELY_GRAPH_SINGLE_KEY}`;
+
+// Unique Alpine component name so multiple blocks on one page don't conflict
+const instanceId = `courseList_${(data as any)?._metadata?.key ?? Math.random().toString(36).slice(2)}`;
+
+const COURSE_SEARCH_QUERY = `
+query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[String!],$offeredBy:[String!],$location:[String!],$query:String,$limit:Int=12,$cursor:String,$locale:[Locales]){
+  CoursePage(locale:$locale where:{_and:[{StudyLevel:{in:$studyLevel}},{ModeOfStudy:{in:$modeOfStudy}},{EntryDates:{in:$entryDate}},{OfferedBy:{in:$offeredBy}},{Location:{in:$location}},{_or:[{Title:{like:$query}},{Qualification:{like:$query}},{School:{like:$query}},{UcasCode:{like:$query}}]}]} limit:$limit cursor:$cursor orderBy:{Title:ASC}){
+    total cursor
+    facets{
+      StudyLevel(orderType:VALUE orderBy:ASC filters:$studyLevel){name count}
+      ModeOfStudy(orderType:VALUE orderBy:ASC filters:$modeOfStudy){name count}
+      EntryDates(orderType:VALUE orderBy:ASC filters:$entryDate){name count}
+      OfferedBy(orderType:VALUE orderBy:ASC filters:$offeredBy){name count}
+      Location(orderType:VALUE orderBy:ASC filters:$location){name count}
+    }
+    items{
+      _metadata{url{default hierarchical} displayName}
+      Title Qualification StudyLevel ModeOfStudy EntryDates Location School Duration
+      Description{html}
+    }
+  }
+}`;
+---
+
+<div
+    class="w-full py-8 component-course-list"
+    x-data={`${instanceId}(${JSON.stringify({
+        graphEndpoint,
+        query: COURSE_SEARCH_QUERY,
+        initialCourses,
+        initialTotal,
+        initialCursor,
+        initialFacets,
+        defaultStudyLevel,
+        pageLimit: limit,
+    })})`}
+    x-init="init()"
+>
+    <!-- Search bar -->
+    <div class="mb-6">
+        <div class="join w-full max-w-xl">
+            <input
+                type="text"
+                placeholder="Search courses, UCAS codes..."
+                class="input input-bordered join-item w-full"
+                x-model.debounce.400ms="searchQuery"
+                @input="search(true)"
+            />
+            <button class="btn join-item" @click="search(true)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex gap-8">
+
+        <!-- Facet sidebar -->
+        <aside class="w-64 shrink-0 hidden lg:block">
+            <!-- Active filters -->
+            <div x-show="hasActiveFilters()" class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold">Active filters</span>
+                    <button class="btn btn-xs btn-ghost" @click="clearAll()">Clear all</button>
+                </div>
+                <div class="flex flex-wrap gap-1">
+                    <template x-for="f in activeFilterList()" :key="f.key + f.value">
+                        <span class="badge badge-primary badge-sm gap-1 cursor-pointer" @click="removeFilter(f.key, f.value)">
+                            <span x-text="f.value"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Facet groups -->
+            <template x-for="facetGroup in facetGroups" :key="facetGroup.key">
+                <div class="mb-6" x-show="facets[facetGroup.key] && facets[facetGroup.key].length > 0">
+                    <h3 class="font-semibold text-sm mb-2" x-text="facetGroup.label"></h3>
+                    <ul class="space-y-1">
+                        <template x-for="option in (facets[facetGroup.key] || [])" :key="option.name">
+                            <li>
+                                <label class="flex items-center gap-2 cursor-pointer text-sm hover:text-primary">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox checkbox-sm checkbox-primary"
+                                        :value="option.name"
+                                        :checked="filters[facetGroup.key].includes(option.name)"
+                                        @change="toggleFilter(facetGroup.key, option.name)"
+                                    />
+                                    <span x-text="option.name" class="flex-1"></span>
+                                    <span x-text="option.count" class="text-xs text-base-content/50 tabular-nums"></span>
+                                </label>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </aside>
+
+        <!-- Course listing -->
+        <div class="flex-1 min-w-0">
+
+            <!-- Results header -->
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm text-base-content/60">
+                    <span x-show="!loading">
+                        Showing <span class="font-semibold text-base-content" x-text="courses.length"></span>
+                        of <span class="font-semibold text-base-content" x-text="total"></span> courses
+                    </span>
+                    <span x-show="loading">Searching...</span>
+                </p>
+                <!-- Mobile filter toggle -->
+                <button class="btn btn-sm btn-outline lg:hidden" @click="mobileFiltersOpen = !mobileFiltersOpen">
+                    Filters
+                    <span x-show="hasActiveFilters()" class="badge badge-primary badge-xs" x-text="activeFilterCount()"></span>
+                </button>
+            </div>
+
+            <!-- Loading indicator -->
+            <div x-show="loading" class="flex justify-center py-12">
+                <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <!-- Course cards -->
+            <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <template x-for="course in courses" :key="course._metadata?.url?.default">
+                    <a
+                        :href="course._metadata?.url?.default || course._metadata?.url?.hierarchical"
+                        class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer"
+                    >
+                        <div class="card-body p-5 gap-2">
+                            <div class="flex flex-wrap gap-1 mb-1">
+                                <span
+                                    x-show="course.StudyLevel"
+                                    class="badge badge-sm"
+                                    :class="{
+                                        'badge-primary': course.StudyLevel === 'Undergraduate',
+                                        'badge-secondary': course.StudyLevel === 'Postgraduate',
+                                        'badge-accent': course.StudyLevel === 'Research',
+                                        'badge-info': course.StudyLevel === 'CPD',
+                                        'badge-neutral': !['Undergraduate','Postgraduate','Research','CPD'].includes(course.StudyLevel)
+                                    }"
+                                    x-text="course.StudyLevel"
+                                ></span>
+                                <template x-for="mode in (course.ModeOfStudy || [])" :key="mode">
+                                    <span class="badge badge-ghost badge-sm" x-text="mode"></span>
+                                </template>
+                            </div>
+                            <h2 class="card-title text-base leading-snug" x-text="course.Title + (course.Qualification ? ' — ' + course.Qualification : '')"></h2>
+                            <p x-show="course.School" class="text-xs text-base-content/50" x-text="course.School"></p>
+                            <div class="flex flex-wrap gap-2 mt-auto pt-2 text-xs text-base-content/60">
+                                <span x-show="course.Location" x-text="course.Location"></span>
+                                <span x-show="course.Duration" class="before:content-['·'] before:mr-2" x-text="course.Duration"></span>
+                            </div>
+                            <div x-show="course.EntryDates && course.EntryDates.length > 0" class="flex flex-wrap gap-1 mt-1">
+                                <template x-for="d in (course.EntryDates || [])" :key="d">
+                                    <span class="badge badge-ghost badge-xs" x-text="'Entry: ' + d"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </a>
+                </template>
+            </div>
+
+            <!-- No results -->
+            <div x-show="!loading && courses.length === 0" class="text-center py-16">
+                <p class="text-lg text-base-content/50 mb-4">No courses found matching your criteria.</p>
+                <button class="btn btn-outline" @click="clearAll()">Clear all filters</button>
+            </div>
+
+            <!-- Load more -->
+            <div x-show="!loading && cursor && courses.length < total" class="mt-8 flex justify-center">
+                <button class="btn btn-outline" @click="loadMore()" :disabled="loadingMore">
+                    <span x-show="!loadingMore">Load more courses</span>
+                    <span x-show="loadingMore" class="loading loading-spinner loading-sm"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile filters drawer -->
+    <div x-show="mobileFiltersOpen" class="fixed inset-0 z-50 lg:hidden" @click.self="mobileFiltersOpen = false">
+        <div class="absolute inset-y-0 right-0 w-80 bg-base-100 shadow-xl overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-bold text-lg">Filters</h2>
+                <button class="btn btn-sm btn-ghost" @click="mobileFiltersOpen = false">✕</button>
+            </div>
+            <template x-for="facetGroup in facetGroups" :key="'mobile-' + facetGroup.key">
+                <div class="mb-6" x-show="facets[facetGroup.key] && facets[facetGroup.key].length > 0">
+                    <h3 class="font-semibold text-sm mb-2" x-text="facetGroup.label"></h3>
+                    <ul class="space-y-1">
+                        <template x-for="option in (facets[facetGroup.key] || [])" :key="'m-' + option.name">
+                            <li>
+                                <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                    <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                                        :value="option.name"
+                                        :checked="filters[facetGroup.key].includes(option.name)"
+                                        @change="toggleFilter(facetGroup.key, option.name)"
+                                    />
+                                    <span x-text="option.name" class="flex-1"></span>
+                                    <span x-text="option.count" class="text-xs text-base-content/50"></span>
+                                </label>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+            <button class="btn btn-primary w-full mt-4" @click="mobileFiltersOpen = false">
+                Show <span x-text="total"></span> results
+            </button>
+        </div>
+    </div>
+</div>
+
+<script is:inline define:vars={{ graphEndpoint, COURSE_SEARCH_QUERY, instanceId, limit }}>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data(instanceId, (config) => ({
+            courses: config.initialCourses,
+            facets: config.initialFacets ?? {},
+            total: config.initialTotal,
+            cursor: config.initialCursor,
+            loading: false,
+            loadingMore: false,
+            mobileFiltersOpen: false,
+            searchQuery: '',
+            filters: {
+                StudyLevel: config.defaultStudyLevel ? [config.defaultStudyLevel] : [],
+                ModeOfStudy: [],
+                EntryDates: [],
+                OfferedBy: [],
+                Location: [],
+            },
+            facetGroups: [
+                { key: 'StudyLevel', label: 'Study Level' },
+                { key: 'ModeOfStudy', label: 'Mode of Study' },
+                { key: 'EntryDates', label: 'Entry In...' },
+                { key: 'OfferedBy', label: 'Offered By' },
+                { key: 'Location', label: 'Location' },
+            ],
+
+            init() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('q')) this.searchQuery = params.get('q');
+                ['StudyLevel', 'ModeOfStudy', 'EntryDates', 'OfferedBy', 'Location'].forEach(key => {
+                    const val = params.getAll(key);
+                    if (val.length) this.filters[key] = val;
+                });
+                if (params.toString()) this.search(true);
+            },
+
+            async search(reset = true) {
+                this.loading = true;
+                if (reset) this.cursor = null;
+                try {
+                    const result = await this._fetch(null);
+                    this.courses = result.items;
+                    this.facets = result.facets;
+                    this.total = result.total;
+                    this.cursor = result.cursor;
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async loadMore() {
+                if (!this.cursor) return;
+                this.loadingMore = true;
+                try {
+                    const result = await this._fetch(this.cursor);
+                    this.courses = [...this.courses, ...result.items];
+                    this.cursor = result.cursor;
+                } finally {
+                    this.loadingMore = false;
+                }
+            },
+
+            async _fetch(cursor) {
+                const variables = {
+                    studyLevel: this.filters.StudyLevel.length ? this.filters.StudyLevel : undefined,
+                    modeOfStudy: this.filters.ModeOfStudy.length ? this.filters.ModeOfStudy : undefined,
+                    entryDate: this.filters.EntryDates.length ? this.filters.EntryDates : undefined,
+                    offeredBy: this.filters.OfferedBy.length ? this.filters.OfferedBy : undefined,
+                    location: this.filters.Location.length ? this.filters.Location : undefined,
+                    query: this.searchQuery ? `*${this.searchQuery}*` : undefined,
+                    cursor: cursor ?? undefined,
+                    limit: config.pageLimit ?? 12,
+                };
+                const res = await fetch(config.graphEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: config.query, variables }),
+                });
+                const json = await res.json();
+                return json.data?.CoursePage ?? { items: [], facets: {}, total: 0, cursor: null };
+            },
+
+            toggleFilter(key, value) {
+                const idx = this.filters[key].indexOf(value);
+                if (idx === -1) this.filters[key].push(value);
+                else this.filters[key].splice(idx, 1);
+                this.search(true);
+            },
+
+            removeFilter(key, value) {
+                const idx = this.filters[key].indexOf(value);
+                if (idx !== -1) this.filters[key].splice(idx, 1);
+                this.search(true);
+            },
+
+            clearAll() {
+                this.filters = { StudyLevel: [], ModeOfStudy: [], EntryDates: [], OfferedBy: [], Location: [] };
+                this.searchQuery = '';
+                this.search(true);
+            },
+
+            hasActiveFilters() {
+                return this.searchQuery || Object.values(this.filters).some(v => v.length > 0);
+            },
+
+            activeFilterCount() {
+                return Object.values(this.filters).reduce((n, v) => n + v.length, 0) + (this.searchQuery ? 1 : 0);
+            },
+
+            activeFilterList() {
+                const list = [];
+                Object.entries(this.filters).forEach(([key, vals]) => {
+                    vals.forEach(value => list.push({ key, value }));
+                });
+                return list;
+            },
+        }));
+    });
+</script>

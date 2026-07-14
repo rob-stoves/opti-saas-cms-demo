@@ -1,0 +1,4 @@
+fragment CourseList on CourseList {
+    DefaultStudyLevel
+    DefaultLimit
+}

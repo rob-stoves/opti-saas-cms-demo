@@ -21,4 +21,5 @@ fragment AllComponentsExceptGrid on _IComponent {
     ...OdpForm
     ...FacetedSearch
     ...DamAssetList
+    ...CourseList
 }

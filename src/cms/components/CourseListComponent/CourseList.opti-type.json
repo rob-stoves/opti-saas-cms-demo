@@ -1,0 +1,40 @@
+{
+	"key": "CourseList",
+	"displayName": "Course List",
+	"description": "Faceted course search block — can be dropped into any Visual Builder page.",
+	"baseType": "_component",
+	"isContract": false,
+	"sortOrder": 0,
+	"mayContainTypes": [],
+	"mediaFileExtensions": [],
+	"compositionBehaviors": [
+		"sectionEnabled",
+		"elementEnabled"
+	],
+	"contracts": [],
+	"properties": {
+		"DefaultStudyLevel": {
+			"type": "string",
+			"displayName": "Default Study Level",
+			"description": "Pre-select a study level filter when the block loads (e.g. Undergraduate, Postgraduate).",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 0,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"DefaultLimit": {
+			"type": "integer",
+			"displayName": "Results per page",
+			"description": "Number of courses to load initially and on each 'Load more'.",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 100,
+			"minimum": 1,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		}
+	}
+}

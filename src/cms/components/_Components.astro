@@ -19,6 +19,7 @@ import Paragraph from './ParagraphComponent/Paragraph.astro';
 import Text from './TextComponent/Text.astro';
 import Video from './VideoComponent/Video.astro';
 import VideoExternal from './VideoExternalComponent/VideoExternal.astro';
+import CourseList from './CourseListComponent/CourseList.astro';
 import OptiForm from '../forms/base/OptiFormsContainerDataComponent/OptiForm.astro';
 
 interface Props {
@@ -230,6 +231,16 @@ const componentType = component._metadata.types[0];
             data={component}
             displaySettings={displaySettings}
             displayTemplateKey={displayTemplateKey}
+        />
+    )
+}
+
+{
+    componentType === 'CourseList' && (
+        <CourseList
+            key={data?.key}
+            contentPayload={contentPayload}
+            data={component}
         />
     )
 }
