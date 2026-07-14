@@ -20,7 +20,9 @@
         "types:pull": "node --env-file=.env ./utils/types/pull.mjs",
         "types:push": "node --env-file=.env ./utils/types/push.mjs",
         "type:pull": "node --env-file=.env ./utils/types/pull.mjs",
-        "type:push": "node --env-file=.env ./utils/types/push.mjs"
+        "type:push": "node --env-file=.env ./utils/types/push.mjs",
+        "courses:ingest": "node --env-file=.env ./utils/courses/ingest-courses.mjs",
+        "courses:dry-run": "COURSE_DRY_RUN=true node --env-file=.env ./utils/courses/ingest-courses.mjs"
     },
     "dependencies": {
         "@astrojs/alpinejs": "^0.4.9",

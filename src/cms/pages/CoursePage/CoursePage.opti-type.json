@@ -1,0 +1,206 @@
+{
+	"key": "CoursePage",
+	"displayName": "Course Page",
+	"description": "Detailed page for an individual course, supporting faceted search and listing via Optimizely Graph.",
+	"baseType": "_page",
+	"isContract": false,
+	"sortOrder": 0,
+	"mayContainTypes": [],
+	"mediaFileExtensions": [],
+	"compositionBehaviors": [],
+	"contracts": [],
+	"properties": {
+		"PageAdminSettings": {
+			"type": "component",
+			"contentType": "PageAdminSettings",
+			"displayName": "Page Admin Settings",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "AdminSettings",
+			"sortOrder": 10,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"SeoSettings": {
+			"type": "component",
+			"contentType": "PageSeoSettings",
+			"displayName": "SEO Settings",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "SeoSettings",
+			"sortOrder": 10,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Title": {
+			"type": "string",
+			"displayName": "Course Title",
+			"description": "Full course name, e.g. Motorsport Technology",
+			"isLocalized": true,
+			"isRequired": true,
+			"group": "Content",
+			"sortOrder": 10,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Qualification": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Qualification",
+			"description": "Qualification awarded, e.g. BEng (Hons), BA (Hons), MSc",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 20,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"StudyLevel": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Study Level",
+			"description": "e.g. Undergraduate, Postgraduate, Research, CPD",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 30,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ModeOfStudy": {
+			"type": "array",
+			"displayName": "Mode of Study",
+			"description": "e.g. Full Time, Part Time",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 40,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"items": {
+				"type": "string"
+			}
+		},
+		"EntryDates": {
+			"type": "array",
+			"displayName": "Entry Dates",
+			"description": "e.g. September 2026, January 2027",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 50,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"items": {
+				"type": "string"
+			}
+		},
+		"OfferedBy": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Offered By",
+			"description": "Delivering institution, e.g. Oxford Brookes University",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 60,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Location": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Location",
+			"description": "e.g. Headington, Distance Learning",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 70,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"School": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "School / Department",
+			"description": "e.g. School of Engineering, Computing and Mathematics",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 80,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Duration": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Duration",
+			"description": "e.g. 3 years, 4 years sandwich",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 90,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"UcasCode": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "UCAS Code",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 100,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Description": {
+			"type": "richText",
+			"displayName": "Course Description",
+			"description": "Overview of the course shown on the detail page",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 110,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"editorSettings": {
+				"preset": "expanded"
+			}
+		},
+		"Accreditations": {
+			"type": "string",
+			"displayName": "Accreditations",
+			"description": "e.g. Accredited by the IET",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 120,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"ExternalUrl": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "External Course URL",
+			"description": "Link to the source course page on brookes.ac.uk",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 130,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		}
+	}
+}

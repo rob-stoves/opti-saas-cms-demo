@@ -1,0 +1,189 @@
+---
+import type { Locales } from 'astro';
+import type { CoursePageFragment } from '../../../../__generated/sdk';
+import { getOptimizelySdk } from '../../../graphql/getSdk';
+import type { ContentPayload } from '../../../graphql/shared/ContentPayload';
+import Layout from '../../../layouts/Layout.astro';
+import { isEditContext } from '../../shared/utils.ts';
+
+const isCmsEdit = isEditContext(Astro.url);
+
+export interface Props {
+    contentPayload: ContentPayload;
+}
+const { contentPayload } = Astro.props as Props;
+
+const optiResponse = await getOptimizelySdk(contentPayload).pageById({
+    key: contentPayload.key,
+    //@ts-ignore
+    loc: contentPayload.loc as Locales,
+    ver: contentPayload.ver,
+});
+
+const page = optiResponse?._Page?.item as CoursePageFragment;
+
+const graphType = page?.SeoSettings?.GraphType ?? 'website';
+const defaultUrl = page?._metadata?.url?.default || '';
+const hierarchicalUrl =
+    page?._metadata?.url?.type === 'SIMPLE'
+        ? page?._metadata?.url?.hierarchical
+        : '';
+const extPreviewEnabled = page?.PageAdminSettings?.EnableExternalPreview ?? false;
+
+const studyLevelBadgeColor: Record<string, string> = {
+    Undergraduate: 'badge-primary',
+    Postgraduate: 'badge-secondary',
+    Research: 'badge-accent',
+    CPD: 'badge-info',
+};
+const studyLevelColor = studyLevelBadgeColor[page?.StudyLevel ?? ''] ?? 'badge-neutral';
+---
+
+<Layout
+    title={page?.SeoSettings?.MetaTitle ?? `${page?.Title ?? ''} ${page?.Qualification ?? ''}`.trim() ?? 'Course'}
+    description={page?.SeoSettings?.MetaDescription ?? page?._metadata?.displayName ?? ''}
+    graphtype={graphType}
+    indexing={page?.SeoSettings?.Indexing ?? false}
+    contentPayload={contentPayload}
+    defaultUrl={defaultUrl}
+    hierarchicalUrl={hierarchicalUrl ?? ''}
+    extPreviewEnabled={extPreviewEnabled}
+>
+    <div class="max-w-screen-xl mx-auto px-4 py-10 page-course">
+
+        <!-- Breadcrumb -->
+        <nav class="text-sm breadcrumbs mb-6">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/courses">Courses</a></li>
+                <li class="text-base-content/60">{page?.Title}</li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex flex-wrap gap-2 mb-3">
+                {page?.StudyLevel && (
+                    <span class={`badge ${studyLevelColor}`}>{page.StudyLevel}</span>
+                )}
+                {page?.ModeOfStudy?.map((mode) => (
+                    <span class="badge badge-outline">{mode}</span>
+                ))}
+            </div>
+
+            <h1
+                class="text-4xl lg:text-5xl font-bold leading-tight mb-2"
+                data-epi-edit={isCmsEdit ? 'Title' : undefined}
+            >
+                {page?.Title}
+            </h1>
+
+            {page?.Qualification && (
+                <p class="text-xl text-base-content/70 mb-4" data-epi-edit={isCmsEdit ? 'Qualification' : undefined}>
+                    {page.Qualification}
+                </p>
+            )}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            <!-- Main content -->
+            <div class="lg:col-span-2">
+                {page?.Description?.html && (
+                    <div
+                        class="prose prose-lg max-w-none mb-8"
+                        set:html={page.Description.html}
+                        data-epi-edit={isCmsEdit ? 'Description' : undefined}
+                    />
+                )}
+
+                {page?.Accreditations && (
+                    <div class="alert alert-info mb-6" data-epi-edit={isCmsEdit ? 'Accreditations' : undefined}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="font-semibold">Accreditations</p>
+                            <p>{page.Accreditations}</p>
+                        </div>
+                    </div>
+                )}
+
+                {page?.ExternalUrl && (
+                    <a
+                        href={page.ExternalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn btn-primary"
+                    >
+                        View on Oxford Brookes website
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                )}
+            </div>
+
+            <!-- Sidebar: course details -->
+            <aside class="lg:col-span-1">
+                <div class="card bg-base-200 shadow-sm">
+                    <div class="card-body gap-4">
+                        <h2 class="card-title text-lg">Course Details</h2>
+
+                        {page?.Duration && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">Duration</p>
+                                <p class="font-medium" data-epi-edit={isCmsEdit ? 'Duration' : undefined}>{page.Duration}</p>
+                            </div>
+                        )}
+
+                        {page?.Location && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">Location</p>
+                                <p class="font-medium" data-epi-edit={isCmsEdit ? 'Location' : undefined}>{page.Location}</p>
+                            </div>
+                        )}
+
+                        {page?.EntryDates && page.EntryDates.length > 0 && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">Entry Dates</p>
+                                <div class="flex flex-wrap gap-1" data-epi-edit={isCmsEdit ? 'EntryDates' : undefined}>
+                                    {page.EntryDates.map((d) => (
+                                        <span class="badge badge-ghost badge-sm">{d}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {page?.School && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">School</p>
+                                <p class="font-medium text-sm" data-epi-edit={isCmsEdit ? 'School' : undefined}>{page.School}</p>
+                            </div>
+                        )}
+
+                        {page?.OfferedBy && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">Offered By</p>
+                                <p class="font-medium text-sm" data-epi-edit={isCmsEdit ? 'OfferedBy' : undefined}>{page.OfferedBy}</p>
+                            </div>
+                        )}
+
+                        {page?.UcasCode && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">UCAS Code</p>
+                                <p class="font-mono font-semibold" data-epi-edit={isCmsEdit ? 'UcasCode' : undefined}>{page.UcasCode}</p>
+                            </div>
+                        )}
+
+                        <div class="divider my-0"></div>
+
+                        <a href="/courses" class="btn btn-outline btn-sm w-full">
+                            ← Back to all courses
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</Layout>

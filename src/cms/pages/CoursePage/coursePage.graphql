@@ -1,0 +1,28 @@
+fragment CoursePage on CoursePage {
+    _metadata {
+        ...PageUrl
+        published
+        displayName
+    }
+    Title
+    Qualification
+    StudyLevel
+    ModeOfStudy
+    EntryDates
+    OfferedBy
+    Location
+    School
+    Duration
+    UcasCode
+    Description {
+        html
+    }
+    Accreditations
+    ExternalUrl
+    SeoSettings {
+        ...PageSeoSettingsProperty
+    }
+    PageAdminSettings {
+        ...PageAdminSettingsProperty
+    }
+}

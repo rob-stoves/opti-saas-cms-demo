@@ -1,0 +1,74 @@
+{
+	"key": "CourseListPage",
+	"displayName": "Course List Page",
+	"description": "Faceted search and listing page for courses, powered by Optimizely Graph aggregations.",
+	"baseType": "_page",
+	"isContract": false,
+	"sortOrder": 0,
+	"mayContainTypes": [],
+	"mediaFileExtensions": [],
+	"compositionBehaviors": [],
+	"contracts": [],
+	"properties": {
+		"PageAdminSettings": {
+			"type": "component",
+			"contentType": "PageAdminSettings",
+			"displayName": "Page Admin Settings",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "AdminSettings",
+			"sortOrder": 10,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"SeoSettings": {
+			"type": "component",
+			"contentType": "PageSeoSettings",
+			"displayName": "SEO Settings",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "SeoSettings",
+			"sortOrder": 10,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Heading": {
+			"type": "string",
+			"displayName": "Heading",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 10,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": []
+		},
+		"Introduction": {
+			"type": "richText",
+			"displayName": "Introduction",
+			"description": "Introductory text shown above the course listing",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 20,
+			"indexingType": "searchable",
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"editorSettings": {
+				"preset": "expanded"
+			}
+		},
+		"DefaultStudyLevel": {
+			"type": "string",
+			"format": "shortString",
+			"displayName": "Default Study Level Filter",
+			"description": "Pre-select a study level facet, e.g. Undergraduate",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 30,
+			"allowedTypes": [],
+			"restrictedTypes": []
+		}
+	}
+}

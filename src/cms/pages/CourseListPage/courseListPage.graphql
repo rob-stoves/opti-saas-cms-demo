@@ -1,0 +1,99 @@
+fragment CourseListPage on CourseListPage {
+    _metadata {
+        ...PageUrl
+        published
+        displayName
+    }
+    Heading
+    Introduction {
+        html
+    }
+    DefaultStudyLevel
+    SeoSettings {
+        ...PageSeoSettingsProperty
+    }
+    PageAdminSettings {
+        ...PageAdminSettingsProperty
+    }
+}
+
+query CourseSearch(
+    $studyLevel: [String!]
+    $modeOfStudy: [String!]
+    $entryDate: [String!]
+    $offeredBy: [String!]
+    $location: [String!]
+    $query: String
+    $limit: Int = 12
+    $cursor: String
+    $locale: [Locales]
+) {
+    CoursePage(
+        locale: $locale
+        where: {
+            _and: [
+                { StudyLevel: { in: $studyLevel } }
+                { ModeOfStudy: { in: $modeOfStudy } }
+                { EntryDates: { in: $entryDate } }
+                { OfferedBy: { in: $offeredBy } }
+                { Location: { in: $location } }
+                {
+                    _or: [
+                        { Title: { like: $query } }
+                        { Qualification: { like: $query } }
+                        { School: { like: $query } }
+                        { UcasCode: { like: $query } }
+                    ]
+                }
+            ]
+        }
+        limit: $limit
+        cursor: $cursor
+        orderBy: { Title: ASC }
+    ) {
+        total
+        cursor
+        facets {
+            StudyLevel(orderType: VALUE, orderBy: ASC, filters: $studyLevel) {
+                name
+                count
+            }
+            ModeOfStudy(orderType: VALUE, orderBy: ASC, filters: $modeOfStudy) {
+                name
+                count
+            }
+            EntryDates(orderType: VALUE, orderBy: ASC, filters: $entryDate) {
+                name
+                count
+            }
+            OfferedBy(orderType: VALUE, orderBy: ASC, filters: $offeredBy) {
+                name
+                count
+            }
+            Location(orderType: VALUE, orderBy: ASC, filters: $location) {
+                name
+                count
+            }
+        }
+        items {
+            _metadata {
+                url {
+                    default
+                    hierarchical
+                }
+                displayName
+            }
+            Title
+            Qualification
+            StudyLevel
+            ModeOfStudy
+            EntryDates
+            Location
+            School
+            Duration
+            Description {
+                html
+            }
+        }
+    }
+}

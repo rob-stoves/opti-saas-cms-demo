@@ -4,6 +4,8 @@ import ArticlePage from './ArticlePage/ArticlePage.astro';
 import LandingPage from './LandingPage/LandingPage.astro';
 import MockupPage from './MockupPage/MockupPage.astro';
 import FolderPage from './FolderPage/FolderPage.astro';
+import CoursePage from './CoursePage/CoursePage.astro';
+import CourseListPage from './CourseListPage/CourseListPage.astro';
 const contentPayload = Astro.props.data as ContentPayload;
 const pageType = contentPayload.types[0];
 ---
@@ -12,3 +14,5 @@ const pageType = contentPayload.types[0];
 {pageType === 'LandingPage' && <LandingPage contentPayload={contentPayload} />}
 {pageType === 'MockupPage' && <MockupPage contentPayload={contentPayload} />}
 {pageType === 'FolderPage' && <FolderPage />}
+{pageType === 'CoursePage' && <CoursePage contentPayload={contentPayload} />}
+{pageType === 'CourseListPage' && <CourseListPage contentPayload={contentPayload} />}
