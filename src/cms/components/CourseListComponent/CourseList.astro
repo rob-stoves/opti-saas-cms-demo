@@ -208,7 +208,7 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
 </script>
 
 <div
-    class="w-full py-8 component-course-list"
+    class="w-full px-6 py-8 component-course-list"
     x-data={`window['${instanceId}'](${JSON.stringify({
         graphEndpoint,
         query: COURSE_SEARCH_QUERY,
