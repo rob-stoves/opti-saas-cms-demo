@@ -71,7 +71,6 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
             loadingMore: false,
             mobileFiltersOpen: false,
             searchQuery: '',
-            showGraphQuery: false,
             lastQuery: null,
             copied: false,
             filters: {
@@ -222,50 +221,6 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
     })})`}
     x-init="init()"
 >
-    <!-- Graph Query panel -->
-    <div class="mb-4">
-        <label class="flex items-center gap-2 text-xs text-base-content/50 cursor-pointer w-fit select-none">
-            <input type="checkbox" class="checkbox checkbox-xs" x-model="showGraphQuery" />
-            Show Graph Query
-        </label>
-        <div x-show="showGraphQuery && lastQuery" class="mt-2 rounded-lg border border-base-300 bg-base-200 text-xs overflow-hidden">
-            <div class="flex items-center justify-between px-3 py-2 border-b border-base-300 bg-base-300/50">
-                <div class="flex items-center gap-3">
-                    <span class="font-mono font-semibold text-primary" x-text="lastQuery?.operation"></span>
-                    <span class="text-base-content/40" x-text="lastQuery?.timestamp"></span>
-                    <span class="font-mono text-base-content/50" x-text="lastQuery?.duration + 'ms'"></span>
-                </div>
-                <button
-                    class="btn btn-xs btn-outline gap-1"
-                    @click="copyQuery()"
-                    :class="{ 'btn-success': copied }"
-                >
-                    <template x-if="!copied">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                    </template>
-                    <span x-text="copied ? 'Copied!' : 'Copy GraphQL'"></span>
-                </button>
-            </div>
-            <div class="p-3">
-                <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Inlined Query (ready for GraphiQL)</p>
-                <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap max-h-48" x-text="(() => {
-                    if (!lastQuery) return '';
-                    const vars = lastQuery.variables;
-                    let q = lastQuery.query.replace(/(\bquery\s+\w+)\s*\([^)]*\)/, '$1');
-                    return q.replace(/\$(\w+)/g, (_, n) => {
-                        const v = vars[n];
-                        return (v !== undefined && v !== null) ? JSON.stringify(v) : 'null';
-                    }).trim();
-                })()"></pre>
-            </div>
-        </div>
-        <div x-show="showGraphQuery && !lastQuery" class="mt-2 rounded-lg border border-base-300 bg-base-200 px-3 py-4 text-xs text-base-content/40 italic">
-            No query sent yet — interact with the search or filters to trigger one.
-        </div>
-    </div>
-
     <!-- Search bar -->
     <div class="mb-6">
         <div class="join w-full max-w-xl">
@@ -343,11 +298,26 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
                     </span>
                     <span x-show="loading">Searching...</span>
                 </p>
-                <!-- Mobile filter toggle -->
-                <button class="btn btn-sm btn-outline lg:hidden" @click="mobileFiltersOpen = !mobileFiltersOpen">
-                    Filters
-                    <span x-show="hasActiveFilters()" class="badge badge-primary badge-xs" x-text="activeFilterCount()"></span>
-                </button>
+                <div class="flex items-center gap-2">
+                    <!-- Mobile filter toggle -->
+                    <button class="btn btn-sm btn-outline lg:hidden" @click="mobileFiltersOpen = !mobileFiltersOpen">
+                        Filters
+                        <span x-show="hasActiveFilters()" class="badge badge-primary badge-xs" x-text="activeFilterCount()"></span>
+                    </button>
+                    <!-- Copy last GraphQL query -->
+                    <button
+                        class="btn btn-xs btn-ghost gap-1 text-base-content/40 hover:text-base-content"
+                        :class="{ 'text-success hover:text-success': copied }"
+                        @click="copyQuery()"
+                        :disabled="!lastQuery"
+                        title="Copy last GraphQL query"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <span x-text="copied ? 'Copied!' : 'Copy GraphQL'"></span>
+                    </button>
+                </div>
             </div>
 
             <!-- Loading indicator -->
