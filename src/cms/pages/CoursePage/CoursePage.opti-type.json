@@ -190,6 +190,22 @@
 			"allowedTypes": [],
 			"restrictedTypes": []
 		},
+		"BottomContentArea": {
+			"type": "array",
+			"displayName": "Bottom Content Area",
+			"description": "Additional content blocks displayed below the Accreditations section",
+			"isLocalized": true,
+			"isRequired": false,
+			"group": "Content",
+			"sortOrder": 130,
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"items": {
+				"type": "content",
+				"allowedTypes": [],
+				"restrictedTypes": []
+			}
+		},
 		"ExternalUrl": {
 			"type": "string",
 			"format": "shortString",
@@ -198,7 +214,7 @@
 			"isLocalized": false,
 			"isRequired": false,
 			"group": "Content",
-			"sortOrder": 130,
+			"sortOrder": 140,
 			"allowedTypes": [],
 			"restrictedTypes": []
 		}

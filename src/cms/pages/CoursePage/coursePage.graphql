@@ -18,6 +18,12 @@ fragment CoursePage on CoursePage {
         html
     }
     Accreditations
+    BottomContentArea {
+        _metadata {
+            types
+        }
+        ...ContentArea
+    }
     ExternalUrl
     SeoSettings {
         ...PageSeoSettingsProperty
