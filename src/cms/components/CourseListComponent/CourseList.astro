@@ -71,6 +71,48 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
     })})`}
     x-init="init()"
 >
+    <!-- Graph Queries panel -->
+    <div class="mb-4">
+        <label class="flex items-center gap-2 text-xs text-base-content/50 cursor-pointer w-fit">
+            <input type="checkbox" class="checkbox checkbox-xs" x-model="showGraphQueries" />
+            Show Graph Queries
+        </label>
+        <div x-show="showGraphQueries" class="mt-2 rounded-lg border border-base-300 bg-base-200 text-xs overflow-hidden">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-base-300 bg-base-300/50">
+                <span class="font-semibold">Graph Queries</span>
+                <span class="text-base-content/50" x-text="graphQueries.length + ' sent'"></span>
+            </div>
+            <div class="max-h-80 overflow-y-auto divide-y divide-base-300">
+                <template x-if="graphQueries.length === 0">
+                    <p class="px-3 py-4 text-base-content/40 italic">No queries sent yet.</p>
+                </template>
+                <template x-for="(q, i) in graphQueries" :key="i">
+                    <div class="px-3 py-2 space-y-1">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono font-semibold text-primary" x-text="q.operation"></span>
+                            <span class="text-base-content/40" x-text="q.timestamp"></span>
+                            <span class="ml-auto font-mono" x-text="q.duration + 'ms'"></span>
+                        </div>
+                        <details class="group">
+                            <summary class="cursor-pointer text-base-content/50 hover:text-base-content list-none flex items-center gap-1">
+                                <svg class="h-3 w-3 transition-transform group-open:rotate-90" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 4.293a1 1 0 011.414 0L13 9.586l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                                Variables
+                            </summary>
+                            <pre class="mt-1 p-2 bg-base-100 rounded text-[10px] overflow-x-auto" x-text="JSON.stringify(q.variables, null, 2)"></pre>
+                        </details>
+                        <details class="group">
+                            <summary class="cursor-pointer text-base-content/50 hover:text-base-content list-none flex items-center gap-1">
+                                <svg class="h-3 w-3 transition-transform group-open:rotate-90" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 4.293a1 1 0 011.414 0L13 9.586l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                                Query
+                            </summary>
+                            <pre class="mt-1 p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap" x-text="q.query"></pre>
+                        </details>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     <!-- Search bar -->
     <div class="mb-6">
         <div class="join w-full max-w-xl">
@@ -252,7 +294,7 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
 </div>
 
 <script is:inline define:vars={{ graphEndpoint, COURSE_SEARCH_QUERY, instanceId, limit }}>
-    document.addEventListener('alpine:init', () => {
+    function _registerCourseList() {
         Alpine.data(instanceId, (config) => ({
             courses: config.initialCourses,
             facets: config.initialFacets ?? {},
@@ -262,6 +304,8 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
             loadingMore: false,
             mobileFiltersOpen: false,
             searchQuery: '',
+            showGraphQueries: false,
+            graphQueries: [],
             filters: {
                 StudyLevel: config.defaultStudyLevel ? [config.defaultStudyLevel] : [],
                 ModeOfStudy: [],
@@ -324,12 +368,21 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
                     cursor: cursor ?? undefined,
                     limit: config.pageLimit ?? 12,
                 };
+                const t0 = performance.now();
                 const res = await fetch(config.graphEndpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: config.query, variables }),
                 });
+                const duration = Math.round(performance.now() - t0);
                 const json = await res.json();
+                this.graphQueries.push({
+                    operation: 'CourseSearch',
+                    timestamp: new Date().toLocaleTimeString(),
+                    duration,
+                    variables,
+                    query: config.query.trim(),
+                });
                 return json.data?.CoursePage ?? { items: [], facets: {}, total: 0, cursor: null };
             },
 
@@ -368,5 +421,21 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
                 return list;
             },
         }));
-    });
+    }
+
+    // Alpine may already be initialized (e.g. when this block is dropped into a VB page
+    // alongside other Alpine components). Register immediately in that case and re-init
+    // this element; otherwise wait for alpine:init as normal.
+    if (window.Alpine) {
+        _registerCourseList();
+        requestAnimationFrame(() => {
+            document.querySelectorAll('[x-data]').forEach(el => {
+                if (el.getAttribute('x-data')?.startsWith(instanceId)) {
+                    Alpine.initTree(el);
+                }
+            });
+        });
+    } else {
+        document.addEventListener('alpine:init', _registerCourseList);
+    }
 </script>
