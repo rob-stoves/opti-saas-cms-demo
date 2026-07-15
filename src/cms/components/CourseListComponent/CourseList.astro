@@ -57,6 +57,156 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
 }`;
 ---
 
+{/* Script MUST come before the x-data div so Alpine.data() is registered
+    before Alpine's MutationObserver processes the element */}
+<script is:inline define:vars={{ COURSE_SEARCH_QUERY, instanceId, limit }}>
+    const _register = () => {
+        Alpine.data(instanceId, (config) => ({
+            courses: config.initialCourses,
+            facets: config.initialFacets ?? {},
+            total: config.initialTotal,
+            cursor: config.initialCursor,
+            loading: false,
+            loadingMore: false,
+            mobileFiltersOpen: false,
+            searchQuery: '',
+            showGraphQuery: false,
+            lastQuery: null,
+            copied: false,
+            filters: {
+                StudyLevel: config.defaultStudyLevel ? [config.defaultStudyLevel] : [],
+                ModeOfStudy: [],
+                EntryDates: [],
+                OfferedBy: [],
+                Location: [],
+            },
+            facetGroups: [
+                { key: 'StudyLevel', label: 'Study Level' },
+                { key: 'ModeOfStudy', label: 'Mode of Study' },
+                { key: 'EntryDates', label: 'Entry In...' },
+                { key: 'OfferedBy', label: 'Offered By' },
+                { key: 'Location', label: 'Location' },
+            ],
+
+            init() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('q')) this.searchQuery = params.get('q');
+                ['StudyLevel', 'ModeOfStudy', 'EntryDates', 'OfferedBy', 'Location'].forEach(key => {
+                    const val = params.getAll(key);
+                    if (val.length) this.filters[key] = val;
+                });
+                if (params.toString()) this.search(true);
+            },
+
+            async search(reset = true) {
+                this.loading = true;
+                if (reset) this.cursor = null;
+                try {
+                    const result = await this._fetch(null);
+                    this.courses = result.items;
+                    this.facets = result.facets;
+                    this.total = result.total;
+                    this.cursor = result.cursor;
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async loadMore() {
+                if (!this.cursor) return;
+                this.loadingMore = true;
+                try {
+                    const result = await this._fetch(this.cursor);
+                    this.courses = [...this.courses, ...result.items];
+                    this.cursor = result.cursor;
+                } finally {
+                    this.loadingMore = false;
+                }
+            },
+
+            async _fetch(cursor) {
+                const variables = {
+                    studyLevel: this.filters.StudyLevel.length ? this.filters.StudyLevel : undefined,
+                    modeOfStudy: this.filters.ModeOfStudy.length ? this.filters.ModeOfStudy : undefined,
+                    entryDate: this.filters.EntryDates.length ? this.filters.EntryDates : undefined,
+                    offeredBy: this.filters.OfferedBy.length ? this.filters.OfferedBy : undefined,
+                    location: this.filters.Location.length ? this.filters.Location : undefined,
+                    query: this.searchQuery ? `*${this.searchQuery}*` : undefined,
+                    cursor: cursor ?? undefined,
+                    limit: config.pageLimit ?? 12,
+                };
+                const t0 = performance.now();
+                const res = await fetch(config.graphEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: config.query, variables }),
+                });
+                const duration = Math.round(performance.now() - t0);
+                const json = await res.json();
+                this.lastQuery = {
+                    operation: 'CourseSearch',
+                    timestamp: new Date().toLocaleTimeString(),
+                    duration,
+                    variables,
+                    query: config.query.trim(),
+                };
+                this.copied = false;
+                return json.data?.CoursePage ?? { items: [], facets: {}, total: 0, cursor: null };
+            },
+
+            copyQuery() {
+                if (!this.lastQuery) return;
+                const text = `# Variables\n${JSON.stringify(this.lastQuery.variables, null, 2)}\n\n# Query\n${this.lastQuery.query}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    this.copied = true;
+                    setTimeout(() => { this.copied = false; }, 2000);
+                });
+            },
+
+            toggleFilter(key, value) {
+                const idx = this.filters[key].indexOf(value);
+                if (idx === -1) this.filters[key].push(value);
+                else this.filters[key].splice(idx, 1);
+                this.search(true);
+            },
+
+            removeFilter(key, value) {
+                const idx = this.filters[key].indexOf(value);
+                if (idx !== -1) this.filters[key].splice(idx, 1);
+                this.search(true);
+            },
+
+            clearAll() {
+                this.filters = { StudyLevel: [], ModeOfStudy: [], EntryDates: [], OfferedBy: [], Location: [] };
+                this.searchQuery = '';
+                this.search(true);
+            },
+
+            hasActiveFilters() {
+                return this.searchQuery || Object.values(this.filters).some(v => v.length > 0);
+            },
+
+            activeFilterCount() {
+                return Object.values(this.filters).reduce((n, v) => n + v.length, 0) + (this.searchQuery ? 1 : 0);
+            },
+
+            activeFilterList() {
+                const list = [];
+                Object.entries(this.filters).forEach(([key, vals]) => {
+                    vals.forEach(value => list.push({ key, value }));
+                });
+                return list;
+            },
+        }));
+    };
+
+    if (window.Alpine) {
+        _register();
+    } else {
+        document.addEventListener('alpine:init', _register);
+    }
+</script>
+
 <div
     class="w-full py-8 component-course-list"
     x-data={`${instanceId}(${JSON.stringify({
@@ -71,45 +221,45 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
     })})`}
     x-init="init()"
 >
-    <!-- Graph Queries panel -->
+    <!-- Graph Query panel -->
     <div class="mb-4">
-        <label class="flex items-center gap-2 text-xs text-base-content/50 cursor-pointer w-fit">
-            <input type="checkbox" class="checkbox checkbox-xs" x-model="showGraphQueries" />
-            Show Graph Queries
+        <label class="flex items-center gap-2 text-xs text-base-content/50 cursor-pointer w-fit select-none">
+            <input type="checkbox" class="checkbox checkbox-xs" x-model="showGraphQuery" />
+            Show Graph Query
         </label>
-        <div x-show="showGraphQueries" class="mt-2 rounded-lg border border-base-300 bg-base-200 text-xs overflow-hidden">
+        <div x-show="showGraphQuery && lastQuery" class="mt-2 rounded-lg border border-base-300 bg-base-200 text-xs overflow-hidden">
             <div class="flex items-center justify-between px-3 py-2 border-b border-base-300 bg-base-300/50">
-                <span class="font-semibold">Graph Queries</span>
-                <span class="text-base-content/50" x-text="graphQueries.length + ' sent'"></span>
+                <div class="flex items-center gap-3">
+                    <span class="font-mono font-semibold text-primary" x-text="lastQuery?.operation"></span>
+                    <span class="text-base-content/40" x-text="lastQuery?.timestamp"></span>
+                    <span class="font-mono text-base-content/50" x-text="lastQuery?.duration + 'ms'"></span>
+                </div>
+                <button
+                    class="btn btn-xs btn-outline gap-1"
+                    @click="copyQuery()"
+                    :class="{ 'btn-success': copied }"
+                >
+                    <template x-if="!copied">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </template>
+                    <span x-text="copied ? 'Copied!' : 'Copy GraphQL'"></span>
+                </button>
             </div>
-            <div class="max-h-80 overflow-y-auto divide-y divide-base-300">
-                <template x-if="graphQueries.length === 0">
-                    <p class="px-3 py-4 text-base-content/40 italic">No queries sent yet.</p>
-                </template>
-                <template x-for="(q, i) in graphQueries" :key="i">
-                    <div class="px-3 py-2 space-y-1">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono font-semibold text-primary" x-text="q.operation"></span>
-                            <span class="text-base-content/40" x-text="q.timestamp"></span>
-                            <span class="ml-auto font-mono" x-text="q.duration + 'ms'"></span>
-                        </div>
-                        <details class="group">
-                            <summary class="cursor-pointer text-base-content/50 hover:text-base-content list-none flex items-center gap-1">
-                                <svg class="h-3 w-3 transition-transform group-open:rotate-90" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 4.293a1 1 0 011.414 0L13 9.586l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                                Variables
-                            </summary>
-                            <pre class="mt-1 p-2 bg-base-100 rounded text-[10px] overflow-x-auto" x-text="JSON.stringify(q.variables, null, 2)"></pre>
-                        </details>
-                        <details class="group">
-                            <summary class="cursor-pointer text-base-content/50 hover:text-base-content list-none flex items-center gap-1">
-                                <svg class="h-3 w-3 transition-transform group-open:rotate-90" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 4.293a1 1 0 011.414 0L13 9.586l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                                Query
-                            </summary>
-                            <pre class="mt-1 p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap" x-text="q.query"></pre>
-                        </details>
-                    </div>
-                </template>
+            <div class="p-3 space-y-2">
+                <div>
+                    <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Variables</p>
+                    <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto" x-text="JSON.stringify(lastQuery?.variables, null, 2)"></pre>
+                </div>
+                <div>
+                    <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Query</p>
+                    <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap" x-text="lastQuery?.query"></pre>
+                </div>
             </div>
+        </div>
+        <div x-show="showGraphQuery && !lastQuery" class="mt-2 rounded-lg border border-base-300 bg-base-200 px-3 py-4 text-xs text-base-content/40 italic">
+            No query sent yet — interact with the search or filters to trigger one.
         </div>
     </div>
 
@@ -292,150 +442,3 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
         </div>
     </div>
 </div>
-
-<script is:inline define:vars={{ graphEndpoint, COURSE_SEARCH_QUERY, instanceId, limit }}>
-    function _registerCourseList() {
-        Alpine.data(instanceId, (config) => ({
-            courses: config.initialCourses,
-            facets: config.initialFacets ?? {},
-            total: config.initialTotal,
-            cursor: config.initialCursor,
-            loading: false,
-            loadingMore: false,
-            mobileFiltersOpen: false,
-            searchQuery: '',
-            showGraphQueries: false,
-            graphQueries: [],
-            filters: {
-                StudyLevel: config.defaultStudyLevel ? [config.defaultStudyLevel] : [],
-                ModeOfStudy: [],
-                EntryDates: [],
-                OfferedBy: [],
-                Location: [],
-            },
-            facetGroups: [
-                { key: 'StudyLevel', label: 'Study Level' },
-                { key: 'ModeOfStudy', label: 'Mode of Study' },
-                { key: 'EntryDates', label: 'Entry In...' },
-                { key: 'OfferedBy', label: 'Offered By' },
-                { key: 'Location', label: 'Location' },
-            ],
-
-            init() {
-                const params = new URLSearchParams(window.location.search);
-                if (params.get('q')) this.searchQuery = params.get('q');
-                ['StudyLevel', 'ModeOfStudy', 'EntryDates', 'OfferedBy', 'Location'].forEach(key => {
-                    const val = params.getAll(key);
-                    if (val.length) this.filters[key] = val;
-                });
-                if (params.toString()) this.search(true);
-            },
-
-            async search(reset = true) {
-                this.loading = true;
-                if (reset) this.cursor = null;
-                try {
-                    const result = await this._fetch(null);
-                    this.courses = result.items;
-                    this.facets = result.facets;
-                    this.total = result.total;
-                    this.cursor = result.cursor;
-                } finally {
-                    this.loading = false;
-                }
-            },
-
-            async loadMore() {
-                if (!this.cursor) return;
-                this.loadingMore = true;
-                try {
-                    const result = await this._fetch(this.cursor);
-                    this.courses = [...this.courses, ...result.items];
-                    this.cursor = result.cursor;
-                } finally {
-                    this.loadingMore = false;
-                }
-            },
-
-            async _fetch(cursor) {
-                const variables = {
-                    studyLevel: this.filters.StudyLevel.length ? this.filters.StudyLevel : undefined,
-                    modeOfStudy: this.filters.ModeOfStudy.length ? this.filters.ModeOfStudy : undefined,
-                    entryDate: this.filters.EntryDates.length ? this.filters.EntryDates : undefined,
-                    offeredBy: this.filters.OfferedBy.length ? this.filters.OfferedBy : undefined,
-                    location: this.filters.Location.length ? this.filters.Location : undefined,
-                    query: this.searchQuery ? `*${this.searchQuery}*` : undefined,
-                    cursor: cursor ?? undefined,
-                    limit: config.pageLimit ?? 12,
-                };
-                const t0 = performance.now();
-                const res = await fetch(config.graphEndpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: config.query, variables }),
-                });
-                const duration = Math.round(performance.now() - t0);
-                const json = await res.json();
-                this.graphQueries.push({
-                    operation: 'CourseSearch',
-                    timestamp: new Date().toLocaleTimeString(),
-                    duration,
-                    variables,
-                    query: config.query.trim(),
-                });
-                return json.data?.CoursePage ?? { items: [], facets: {}, total: 0, cursor: null };
-            },
-
-            toggleFilter(key, value) {
-                const idx = this.filters[key].indexOf(value);
-                if (idx === -1) this.filters[key].push(value);
-                else this.filters[key].splice(idx, 1);
-                this.search(true);
-            },
-
-            removeFilter(key, value) {
-                const idx = this.filters[key].indexOf(value);
-                if (idx !== -1) this.filters[key].splice(idx, 1);
-                this.search(true);
-            },
-
-            clearAll() {
-                this.filters = { StudyLevel: [], ModeOfStudy: [], EntryDates: [], OfferedBy: [], Location: [] };
-                this.searchQuery = '';
-                this.search(true);
-            },
-
-            hasActiveFilters() {
-                return this.searchQuery || Object.values(this.filters).some(v => v.length > 0);
-            },
-
-            activeFilterCount() {
-                return Object.values(this.filters).reduce((n, v) => n + v.length, 0) + (this.searchQuery ? 1 : 0);
-            },
-
-            activeFilterList() {
-                const list = [];
-                Object.entries(this.filters).forEach(([key, vals]) => {
-                    vals.forEach(value => list.push({ key, value }));
-                });
-                return list;
-            },
-        }));
-    }
-
-    // Alpine may already be initialized (e.g. when this block is dropped into a VB page
-    // alongside other Alpine components). Register immediately in that case and re-init
-    // this element; otherwise wait for alpine:init as normal.
-    if (window.Alpine) {
-        _registerCourseList();
-        requestAnimationFrame(() => {
-            document.querySelectorAll('[x-data]').forEach(el => {
-                if (el.getAttribute('x-data')?.startsWith(instanceId)) {
-                    Alpine.initTree(el);
-                }
-            });
-        });
-    } else {
-        document.addEventListener('alpine:init', _registerCourseList);
-    }
-</script>
