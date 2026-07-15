@@ -157,8 +157,15 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
 
             copyQuery() {
                 if (!this.lastQuery) return;
-                const text = `# Variables\n${JSON.stringify(this.lastQuery.variables, null, 2)}\n\n# Query\n${this.lastQuery.query}`;
-                navigator.clipboard.writeText(text).then(() => {
+                const vars = this.lastQuery.variables;
+                // Strip variable declarations from the query signature
+                let q = this.lastQuery.query.replace(/(\bquery\s+\w+)\s*\([^)]*\)/, '$1');
+                // Inline each $varName with its JSON value (null for absent/undefined)
+                q = q.replace(/\$(\w+)/g, (_, name) => {
+                    const val = vars[name];
+                    return (val !== undefined && val !== null) ? JSON.stringify(val) : 'null';
+                });
+                navigator.clipboard.writeText(q.trim()).then(() => {
                     this.copied = true;
                     setTimeout(() => { this.copied = false; }, 2000);
                 });
@@ -241,15 +248,17 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
                     <span x-text="copied ? 'Copied!' : 'Copy GraphQL'"></span>
                 </button>
             </div>
-            <div class="p-3 space-y-2">
-                <div>
-                    <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Variables</p>
-                    <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto" x-text="JSON.stringify(lastQuery?.variables, null, 2)"></pre>
-                </div>
-                <div>
-                    <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Query</p>
-                    <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap" x-text="lastQuery?.query"></pre>
-                </div>
+            <div class="p-3">
+                <p class="text-base-content/40 mb-1 uppercase tracking-wider text-[10px]">Inlined Query (ready for GraphiQL)</p>
+                <pre class="p-2 bg-base-100 rounded text-[10px] overflow-x-auto whitespace-pre-wrap max-h-48" x-text="(() => {
+                    if (!lastQuery) return '';
+                    const vars = lastQuery.variables;
+                    let q = lastQuery.query.replace(/(\bquery\s+\w+)\s*\([^)]*\)/, '$1');
+                    return q.replace(/\$(\w+)/g, (_, n) => {
+                        const v = vars[n];
+                        return (v !== undefined && v !== null) ? JSON.stringify(v) : 'null';
+                    }).trim();
+                })()"></pre>
             </div>
         </div>
         <div x-show="showGraphQuery && !lastQuery" class="mt-2 rounded-lg border border-base-300 bg-base-200 px-3 py-4 text-xs text-base-content/40 italic">
