@@ -14,7 +14,6 @@ fragment CoursePage on CoursePage {
     School
     Duration
     UcasCode
-    Categories
     Description {
         html
     }
