@@ -201,6 +201,21 @@
 			"sortOrder": 130,
 			"allowedTypes": [],
 			"restrictedTypes": []
+		},
+		"Categories": {
+			"type": "array",
+			"displayName": "Categories",
+			"description": "Subject categories for this course, e.g. Engineering, Business, Health",
+			"isLocalized": false,
+			"isRequired": false,
+			"group": "CourseDetails",
+			"sortOrder": 85,
+			"indexingType": "queryable",
+			"allowedTypes": [],
+			"restrictedTypes": [],
+			"items": {
+				"type": "string"
+			}
 		}
 	}
 }

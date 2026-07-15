@@ -176,6 +176,17 @@ const studyLevelColor = studyLevelBadgeColor[page?.StudyLevel ?? ''] ?? 'badge-n
                             </div>
                         )}
 
+                        {page?.Categories && page.Categories.length > 0 && (
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-base-content/50 mb-1">Categories</p>
+                                <div class="flex flex-wrap gap-1" data-epi-edit={isCmsEdit ? 'Categories' : undefined}>
+                                    {page.Categories.map((cat) => (
+                                        <span class="badge badge-outline badge-sm">{cat}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div class="divider my-0"></div>
 
                         <a href="/find/" class="btn btn-outline btn-sm w-full">
