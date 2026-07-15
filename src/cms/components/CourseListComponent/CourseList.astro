@@ -60,8 +60,9 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
 {/* Script MUST come before the x-data div so Alpine.data() is registered
     before Alpine's MutationObserver processes the element */}
 <script is:inline define:vars={{ COURSE_SEARCH_QUERY, instanceId, limit }}>
-    const _register = () => {
-        Alpine.data(instanceId, (config) => ({
+    // Set factory directly on window — guaranteed to exist before Alpine processes
+    // the x-data div below, since this inline script runs synchronously first.
+    window[instanceId] = (config) => ({
             courses: config.initialCourses,
             facets: config.initialFacets ?? {},
             total: config.initialTotal,
@@ -197,19 +198,12 @@ query CourseSearch($studyLevel:[String!],$modeOfStudy:[String!],$entryDate:[Stri
                 });
                 return list;
             },
-        }));
-    };
-
-    if (window.Alpine) {
-        _register();
-    } else {
-        document.addEventListener('alpine:init', _register);
-    }
+        });
 </script>
 
 <div
     class="w-full py-8 component-course-list"
-    x-data={`${instanceId}(${JSON.stringify({
+    x-data={`window['${instanceId}'](${JSON.stringify({
         graphEndpoint,
         query: COURSE_SEARCH_QUERY,
         initialCourses,
