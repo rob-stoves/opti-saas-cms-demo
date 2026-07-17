@@ -30,12 +30,16 @@ query getAllPagesForSitemap(
             }
             ... on ArticlePage {
                 SeoSettings {
-                    Indexing
+                    ... on PageSeoSettingsProperty {
+                        Indexing
+                    }
                 }
             }
             ... on LandingPage {
                 SeoSettings {
-                    Indexing
+                    ... on PageSeoSettingsProperty {
+                        Indexing
+                    }
                 }
             }
             ... on BlankExperience {

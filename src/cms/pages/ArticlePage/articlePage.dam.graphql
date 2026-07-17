@@ -15,7 +15,9 @@ fragment ArticlePage on ArticlePage {
         html
     }
     SeoSettings {
-        ...PageSeoSettingsProperty
+        ... on PageSeoSettingsProperty {
+            ...PageSeoSettingsProperty
+        }
     }
     PageAdminSettings {
         ...PageAdminSettingsProperty
