@@ -36,7 +36,7 @@ query searchContent(
                     ...ContentReferenceItem
                 }
                 SeoSettings {
-                    ... on PageSeoSettingsProperty {
+                    ... on PageSeoSettings {
                         ...PageSeoSettingsProperty
                     }
                 }
@@ -46,7 +46,7 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ... on PageSeoSettingsProperty {
+                    ... on PageSeoSettings {
                         ...PageSeoSettingsProperty
                     }
                 }
@@ -92,7 +92,7 @@ query searchContent(
                     ...ContentReferenceItem
                 }
                 SeoSettings {
-                    ... on PageSeoSettingsProperty {
+                    ... on PageSeoSettings {
                         ...PageSeoSettingsProperty
                     }
                 }
@@ -102,7 +102,7 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ... on PageSeoSettingsProperty {
+                    ... on PageSeoSettings {
                         ...PageSeoSettingsProperty
                     }
                 }

@@ -17,7 +17,7 @@ fragment LandingPage on LandingPage {
         ...ContentArea
     }
     SeoSettings {
-        ... on PageSeoSettingsProperty {
+        ... on PageSeoSettings {
             ...PageSeoSettingsProperty
         }
     }

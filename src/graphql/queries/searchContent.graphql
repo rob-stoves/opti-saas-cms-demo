@@ -37,7 +37,9 @@ query searchContent(
                     }
                 }
                 SeoSettings {
-                    ...PageSeoSettingsProperty
+                    ... on PageSeoSettings {
+                        ...PageSeoSettingsProperty
+                    }
                 }
             }
             ... on LandingPage {
@@ -45,7 +47,9 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ...PageSeoSettingsProperty
+                    ... on PageSeoSettings {
+                        ...PageSeoSettingsProperty
+                    }
                 }
             }
             ... on BlankExperience {
@@ -90,7 +94,9 @@ query searchContent(
                     }
                 }
                 SeoSettings {
-                    ...PageSeoSettingsProperty
+                    ... on PageSeoSettings {
+                        ...PageSeoSettingsProperty
+                    }
                 }
             }
             ... on LandingPage {
@@ -98,7 +104,9 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ...PageSeoSettingsProperty
+                    ... on PageSeoSettings {
+                        ...PageSeoSettingsProperty
+                    }
                 }
             }
             ... on BlankExperience {
