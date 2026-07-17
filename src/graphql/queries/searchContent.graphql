@@ -38,7 +38,10 @@ query searchContent(
                 }
                 SeoSettings {
                     ... on PageSeoSettings {
-                        ...PageSeoSettingsProperty
+                        MetaTitle
+                        MetaDescription
+                        GraphType
+                        Indexing
                     }
                 }
             }
@@ -47,9 +50,7 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ... on PageSeoSettings {
-                        ...PageSeoSettingsProperty
-                    }
+                    ...PageSeoSettingsProperty
                 }
             }
             ... on BlankExperience {
@@ -95,7 +96,10 @@ query searchContent(
                 }
                 SeoSettings {
                     ... on PageSeoSettings {
-                        ...PageSeoSettingsProperty
+                        MetaTitle
+                        MetaDescription
+                        GraphType
+                        Indexing
                     }
                 }
             }
@@ -104,9 +108,7 @@ query searchContent(
                     displayName
                 }
                 SeoSettings {
-                    ... on PageSeoSettings {
-                        ...PageSeoSettingsProperty
-                    }
+                    ...PageSeoSettingsProperty
                 }
             }
             ... on BlankExperience {

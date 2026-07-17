@@ -1,4 +1,4 @@
-fragment PageSeoSettingsProperty on PageSeoSettings {
+fragment PageSeoSettingsProperty on PageSeoSettingsProperty {
     MetaTitle
     MetaDescription
     SharingImage {

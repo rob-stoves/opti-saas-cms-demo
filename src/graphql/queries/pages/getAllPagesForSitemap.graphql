@@ -37,9 +37,7 @@ query getAllPagesForSitemap(
             }
             ... on LandingPage {
                 SeoSettings {
-                    ... on PageSeoSettings {
-                        Indexing
-                    }
+                    Indexing
                 }
             }
             ... on BlankExperience {

@@ -15,7 +15,15 @@ fragment ArticlePage on ArticlePage {
     }
     SeoSettings {
         ... on PageSeoSettings {
-            ...PageSeoSettingsProperty
+            MetaTitle
+            MetaDescription
+            SharingImage {
+                url {
+                    default
+                }
+            }
+            GraphType
+            Indexing
         }
     }
     PageAdminSettings {
